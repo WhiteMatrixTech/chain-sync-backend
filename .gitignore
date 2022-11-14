@@ -1,0 +1,64 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Maven ###
+**/mvnw
+**/mvnw.cmd
+**/.mvn
+**/target/
+
+### Vim ###
+**/bin/main
+**/bin/test
+**/bin/integration
+
+### log ###
+/log/
+*.log
+
+### Docker compose ###
+data/
+
+### Testing ###
+nohup.out
+.vim/coc-settings.json
+matrix-cloud-land/beta.sh
+
+**/swagger.json
+.DS_Store
+### Groovy ###
+lib

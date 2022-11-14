@@ -1,0 +1,30 @@
+{
+  "fields": [
+    {
+      "name": "chainType",
+      "type": "string"
+    },
+    {
+      "name": "chainName",
+      "type": "string"
+    },
+    {
+      "name": "blockNumber",
+      "type": "long"
+    },
+    {
+      "name": "transactionHash",
+      "type": "string"
+    },
+    {
+      "name": "events",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    }
+  ],
+  "name": "BlockchainTransactionDTO",
+  "namespace": "com.matrix.eventhandler.model",
+  "type": "record"
+}

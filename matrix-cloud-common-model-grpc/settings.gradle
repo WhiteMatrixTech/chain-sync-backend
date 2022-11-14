@@ -1,0 +1,2 @@
+rootProject.name = 'matrix-cloud-common-model-grpc'
+includeBuild '../matrix-common-model'

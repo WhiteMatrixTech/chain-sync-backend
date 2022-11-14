@@ -1,0 +1,17 @@
+syntax = "proto3";
+package com.matrix.common;
+
+message TestObject1 {
+  string arg1 = 1;
+  int32 arg2 = 2;
+  map<string, string> arg3 = 3;
+  repeated string arg4 = 4;
+  TestObject2 arg5 = 5;
+}
+
+message TestObject2 {
+  string arg1 = 1;
+  int32 arg2 = 2;
+  map<string, string> arg3 = 3;
+  repeated string arg4 = 4;
+}

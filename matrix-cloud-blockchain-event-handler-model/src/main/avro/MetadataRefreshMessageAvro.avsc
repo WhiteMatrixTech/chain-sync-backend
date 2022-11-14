@@ -1,0 +1,16 @@
+{
+  "fields": [
+    {
+      "name": "itemId",
+      "type": "string"
+    },
+    {
+      "name": "force",
+      "type": "boolean",
+      "default": false
+    }
+  ],
+  "name": "MetadataRefreshMessageDTO",
+  "namespace": "com.matrix.eventhandler.model",
+  "type": "record"
+}

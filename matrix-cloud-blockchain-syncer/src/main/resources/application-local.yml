@@ -1,0 +1,23 @@
+blockchain:
+  rinkeby-provider-endpoint:
+    - ${rinkeby-provider-endpoint}
+  ethereum-provider-endpoint:
+    - ${ethereum-provider-endpoint}
+  mumbai-provider-endpoint:
+    - ${mumbai-provider-endpoint}
+  polygon-provider-endpoint:
+    - ${polygon-provider-endpoint}
+cloudfrontUrl: ${cloudfrontUrl}
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+grpc:
+  client:
+    matrix-cloud-flow-service:
+      address: 'static://localhost:9091'
+      negotiationType: 'PLAINTEXT'
+    marketplace-flow-service:
+      address: 'static://localhost:9092'
+      negotiationType: 'PLAINTEXT'

@@ -1,0 +1,3 @@
+# Auto Configuration, need use with @EnableAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.matrix.module.DefaultDynamoModule

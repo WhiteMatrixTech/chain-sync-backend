@@ -1,0 +1,3 @@
+includeBuild '../matrix-dynamodb-sdk'
+includeBuild '../matrix-common-model'
+rootProject.name = 'matrix-cloud-dao'
