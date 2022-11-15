@@ -1,0 +1,11 @@
+spring:
+  redis:
+    host: ${redis_url_alpha}
+    port: 6379
+    password: ${redis_password_alpha}
+    database: 1
+grpc:
+  client:
+    matrix-cloud-blockchain-syncer:
+      address: 'static://localhost:9090'
+      negotiationType: 'PLAINTEXT'

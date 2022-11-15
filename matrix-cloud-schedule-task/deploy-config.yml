@@ -1,14 +1,23 @@
 app: matrix-cloud
-service: matrix-cloud-blockchain-syncer
+service: schedule-task
+project: marketplace
 ports:
-  - port: 9090
-    targetPort: 9090
-    name: grpc
+  - port: 8080
+    targetPort: 8080
+    name: http
 metrics:
   scrape: true
   path: /metrics/prometheus
 hpa: false
 serviceAccountName: aws-access
+resources:
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+  requests:
+    cpu: "1"
+    memory: "1Gi"
+replicas: 3
 deploy:
   image: ${deploy-image}
   stage:
