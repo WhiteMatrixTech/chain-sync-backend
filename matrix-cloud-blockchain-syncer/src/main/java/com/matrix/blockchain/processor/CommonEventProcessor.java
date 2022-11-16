@@ -24,7 +24,6 @@ import com.matrix.blockchain.model.BlockchainType;
 import com.matrix.blockchain.model.FailedBlock;
 import com.matrix.blockchain.model.GetTransactionEventsRequest;
 import com.matrix.blockchain.model.GetTransactionEventsResponse;
-import com.matrix.blockchain.model.NotifyStatus;
 import com.matrix.blockchain.model.SyncError;
 import com.matrix.blockchain.model.SyncResponse;
 import com.matrix.common.util.ProtobufBeanUtil;
@@ -33,7 +32,6 @@ import com.matrix.eventhandler.client.BlockchainLogKafkaClient;
 import com.matrix.eventhandler.client.BlockchainTransactionHistoryKafkaClient;
 import com.matrix.eventhandler.client.BlockchainTransactionKafkaClient;
 import com.matrix.eventhandler.model.BlockchainTransactionDTO;
-import com.matrix.marketplace.blockchain.dao.BlockchainTransactionDao;
 import com.matrix.marketplace.blockchain.model.BlockchainTransaction;
 import com.matrix.marketplace.blockchain.util.PaddingUtil;
 import java.io.BufferedReader;
@@ -76,8 +74,6 @@ public class CommonEventProcessor implements EventProcessor {
 
   @Resource
   Map<String, BlockchainTransactionHistoryKafkaClient> blockchainTransactionHistoryKafkaClientMap;
-
-  @Resource Map<String, BlockchainTransactionDao> blockchainTransactionDaoMap;
 
   @Resource BlockSuccessDao blockSuccessDao;
 
@@ -155,16 +151,6 @@ public class CommonEventProcessor implements EventProcessor {
     }
   }
 
-  public void processTransactions(
-      final BlockRange blockRange, final List<BlockchainTransaction> transactions) {
-    // persistent
-    persistentTransactions(blockRange, transactions);
-    // notify
-    notifyTransactions(blockRange, transactions);
-    // update status
-    updateTransactionStatus(blockRange, transactions);
-  }
-
   public List<BlockEvent> queryEvents(final BaseQueryDao queryDao, final BlockRange blockRange) {
     final long fromId = blockRange.getFrom() / BlockEvent.BATCH_SIZE;
     final long toId = blockRange.getTo() / BlockEvent.BATCH_SIZE;
@@ -211,29 +197,6 @@ public class CommonEventProcessor implements EventProcessor {
     return eventMap;
   }
 
-  public Map<String, BlockchainTransaction> getTransactionMap(final BlockRange blockRange) {
-    BlockchainTransactionDao blockchainTransactionDao =
-        this.getBlockchainTransactionDao(blockRange);
-
-    final Map<String, BlockchainTransaction> transactionHashMap = new HashMap<>();
-    final List<BlockchainTransaction> items =
-        blockchainTransactionDao.queryTransactions(
-            com.matrix.marketplace.blockchain.model.BlockRange.builder()
-                .chainType(blockRange.getChainType())
-                .from(blockRange.getFrom())
-                .to(blockRange.getTo())
-                .build());
-    if (items != null) {
-      transactionHashMap.putAll(
-          items.stream()
-              .collect(
-                  Collectors.toMap(
-                      BlockchainTransaction::getTransactionHash, Function.identity())));
-    }
-
-    return transactionHashMap;
-  }
-
   public void persistentError(final BlockRange blockRange, final Exception error) {
     final SyncError syncError =
         SyncError.builder()
@@ -267,51 +230,6 @@ public class CommonEventProcessor implements EventProcessor {
   protected String getEventDataS3Key(
       final String chainType, final String txHash, final Long logIndex) {
     return chainType + CONNECTOR + txHash + CONNECTOR + logIndex;
-  }
-
-  private void persistentTransactions(final BlockRange blockRange, final List transactions) {
-
-    BlockchainTransactionDao blockchainTransactionDao =
-        this.getBlockchainTransactionDao(blockRange);
-
-    if (!CollectionUtils.isEmpty(transactions)) {
-      blockchainTransactionDao.parallelPutItem(transactions);
-    }
-
-    log.info(
-        "success persistent transactions, chainId: {}, range from: {} to: {}, final size: {}",
-        blockRange.getChainId(),
-        blockRange.getFrom(),
-        blockRange.getTo(),
-        transactions.size());
-  }
-
-  protected void notifyTransactions(
-      final BlockRange blockRange, final List<BlockchainTransaction> transactions) {
-    BlockchainTransactionKafkaClient blockchainTransactionKafkaClient =
-        blockchainTransactionKafkaClientMap.get(
-            BlockchainType.getBlockchainTransactionKafkaClient(blockRange.getChainId()));
-
-    if (!CollectionUtils.isEmpty(transactions)) {
-      for (final BlockchainTransaction transaction : transactions) {
-        blockchainTransactionKafkaClient.sendDefault(
-            transaction.getChainType() + CONNECTOR + transaction.getBlockNumber(),
-            BlockchainTransactionDTO.newBuilder()
-                .setChainType(blockRange.getChainType())
-                .setChainName(blockRange.getChainName())
-                .setBlockNumber(transaction.getBlockNumber())
-                .setTransactionHash(transaction.getTransactionHash())
-                .setEvents(transaction.getEvents())
-                .build());
-      }
-
-      log.info(
-          "success notify {} transactions, range from: {}, to: {}, transactions size: {}",
-          blockRange.getChainId(),
-          blockRange.getFrom(),
-          blockRange.getTo(),
-          transactions.size());
-    }
   }
 
   protected void notifyTransactions(
@@ -366,26 +284,6 @@ public class CommonEventProcessor implements EventProcessor {
           blockList.getBlockNumbersList(),
           transactions.size());
     }
-  }
-
-  private void updateTransactionStatus(
-      final BlockRange blockRange, final List<BlockchainTransaction> transactions) {
-    BlockchainTransactionDao blockchainTransactionDao =
-        this.getBlockchainTransactionDao(blockRange);
-    final Instant now = Instant.now();
-    for (final BlockchainTransaction transaction : transactions) {
-      transaction.setStatus(NotifyStatus.SENT.name());
-      transaction.setUpdatedAt(now);
-    }
-    blockchainTransactionDao.parallelPutItem(transactions);
-  }
-
-  private BlockchainTransactionDao getBlockchainTransactionDao(BlockRange blockRange) {
-    BlockchainTransactionDao blockchainTransactionDao =
-        blockchainTransactionDaoMap.get(
-            BlockchainType.getBlockchainTransactionDao(blockRange.getChainId()));
-
-    return blockchainTransactionDao;
   }
 
   @SneakyThrows

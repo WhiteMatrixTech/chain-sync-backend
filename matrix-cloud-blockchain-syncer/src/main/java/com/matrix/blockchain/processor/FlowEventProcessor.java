@@ -2,38 +2,21 @@ package com.matrix.blockchain.processor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.matrix.blockchain.constants.Constants;
-import com.matrix.blockchain.dao.BlockTipDao;
 import com.matrix.blockchain.handler.FlowSyncHandler;
 import com.matrix.blockchain.model.BlockEvent;
 import com.matrix.blockchain.model.BlockList;
 import com.matrix.blockchain.model.BlockRange;
-import com.matrix.blockchain.model.BlockTip;
-import com.matrix.blockchain.model.BlockchainType;
 import com.matrix.blockchain.model.FailedBlock;
-import com.matrix.blockchain.model.FlowBlockEvent;
 import com.matrix.blockchain.model.GetTransactionEventsRequest;
 import com.matrix.blockchain.model.GetTransactionEventsResponse;
-import com.matrix.blockchain.model.NotifyStatus;
 import com.matrix.blockchain.model.SyncResponse;
 import com.matrix.blockchain.model.SyncResponse.Builder;
 import com.matrix.blockchain.model.SyncStatus;
 import com.matrix.blockchain.model.TransactionEvent;
-import com.matrix.blockchain.retriever.FlowEventRetriever;
 import com.matrix.common.model.ChainType;
-import com.matrix.dynamodb.dao.BaseQueryDao;
 import com.matrix.marketplace.blockchain.model.BlockchainTransaction;
-import com.matrix.metric.util.MetricUtil;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
@@ -41,8 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.web3j.protocol.core.methods.response.EthBlock.Block;
-import proto.v1.BlockEventsResponseEvent;
 import schedule.proto.Event;
 import schedule.proto.FailedHeight;
 import schedule.proto.ScheduleJobResp;
@@ -55,156 +36,20 @@ import schedule.proto.Transaction;
 @Component
 public class FlowEventProcessor extends CommonEventProcessor {
 
-  @Resource FlowEventRetriever eventRetriever;
-  @Resource BlockTipDao blockTipDao;
-  @Resource MeterRegistry meterRegistry;
-  @Resource private Map<String, BaseQueryDao<FlowBlockEvent>> flowBlockEventDaoMap;
-  @Resource FlowSyncHandler flowSyncHandler;
+  @Resource
+  FlowSyncHandler flowSyncHandler;
 
   @Value("${s3.event.flow.bucket}")
   private String flowEventBucket;
 
   @Override
   public List<BlockEvent> process(BlockRange blockRange) {
-    try {
-      BaseQueryDao flowBlockEventDao =
-          flowBlockEventDaoMap.get(BlockchainType.getBlockEventDao(blockRange.getChainId()));
-
-      final long blockHeight = eventRetriever.getBlockHeight(blockRange.getChainId());
-      if (blockRange.getFrom() > blockHeight) {
-        return Lists.newArrayList();
-      }
-      if (blockRange.getTo() > blockHeight) {
-        blockRange = blockRange.toBuilder().setTo(blockHeight).build();
-      }
-
-      // step 0. query block tip
-      final BlockTip tip = blockTipDao.getItem(blockRange.getChainId());
-      if (tip.getBlockNumber() >= blockRange.getTo()) {
-        return super.queryEvents(flowBlockEventDao, blockRange);
-      }
-
-      // step 1. get event logs from chain
-      final List<BlockEventsResponseEvent> logs = eventRetriever.retrieveEvents(blockRange);
-      final Map<Long, Block> blockMap = new HashMap<>();
-
-      // step 2. persistent events into ddb
-      final List<BlockEvent> events =
-          filterAndConvertEvents(blockMap, logs, super.getEventMap(flowBlockEventDao, blockRange));
-      super.persistentEvents(flowBlockEventDao, blockRange, events);
-
-      // step 3. notify through mq
-      // super.notifyEvents(blockRange, events);
-
-      // step 4. update event status to SENT
-      // updateEventStatus(flowBlockEventDao, events);
-
-      final List<BlockchainTransaction> transactions =
-          filterAndConvertTransactions(logs, super.getTransactionMap(blockRange));
-
-      // step 5. persistent & notify transactions
-      super.processTransactions(blockRange, transactions);
-
-      // step 6. update tip
-      blockTipDao.updateTip(blockRange);
-
-      return events;
-    } catch (final Exception e) {
-      log.error(
-          "sync chainType: {}, from: {}, to: {}, error: {}",
-          blockRange.getChainType(),
-          blockRange.getFrom(),
-          blockRange.getTo(),
-          e);
-      MetricUtil.addGauge(
-          meterRegistry,
-          "blockchain_sync_error",
-          1,
-          Tag.of("ChainType", blockRange.getChainType()));
-
-      super.persistentError(blockRange, e);
-      throw new RuntimeException(e);
-    }
+    return List.of();
   }
 
   @Override
   public boolean isApplicable(final String chainType) {
     return ChainType.flow.name().equalsIgnoreCase(chainType);
-  }
-
-  private List<BlockEvent> filterAndConvertEvents(
-      final Map<Long, Block> blockMap,
-      final List<BlockEventsResponseEvent> events,
-      final Map<String, BlockEvent> eventMap) {
-    final List<BlockEvent> blockEvents = new ArrayList<>();
-    for (final BlockEventsResponseEvent event : events) {
-      final FlowBlockEvent blockEvent = FlowBlockEvent.convertFromEventLog(event);
-
-      blockEvent.resolveEventKey(
-          blockEvent.getBlockNumber(), blockEvent.getTransactionIndex(), blockEvent.getLogIndex());
-      if (isExceeded(blockEvent.getData())) {
-        blockEvent.setPersistenceData(true);
-        blockEvent.setData(
-            uploadS3(
-                blockEvent.getData(),
-                Constants.EVENT_FOLDER,
-                getEventDataS3Key(
-                    ChainType.flow.name(),
-                    blockEvent.getTransactionHash(),
-                    blockEvent.getLogIndex())));
-      }
-      final String key = blockEvent.getKey();
-      if (eventMap.get(key) == null
-          || NotifyStatus.NOT_SENT
-              .name()
-              .equalsIgnoreCase(((FlowBlockEvent) eventMap.get(key)).getStatus())) {
-        blockEvent.setStatus(NotifyStatus.NOT_SENT.name());
-        final long blockTimestamp =
-            blockMap.get(Long.valueOf(event.getBlockId())) == null
-                ? System.currentTimeMillis() / 1000
-                : blockMap.get(Long.valueOf(event.getBlockId())).getTimestamp().longValue();
-        blockEvent.setBlockTimestamp(blockTimestamp);
-        blockEvents.add(blockEvent);
-      }
-    }
-
-    return blockEvents;
-  }
-
-  private List<BlockchainTransaction> filterAndConvertTransactions(
-      final List<BlockEventsResponseEvent> events,
-      final Map<String, BlockchainTransaction> transactionMap) {
-    final Map<String, BlockchainTransaction> notSendTransactionMap = new LinkedHashMap<>();
-    // remove duplicate event
-    final Map<String, Set<String>> transactionEventsMap = new HashMap<>();
-    for (final BlockEventsResponseEvent event : events) {
-      final String transactionHash = event.getTransactionId();
-      if (transactionMap.get(transactionHash) == null
-          || NotifyStatus.NOT_SENT
-              .name()
-              .equalsIgnoreCase(transactionMap.get(event.getTransactionId()).getStatus())) {
-        if (notSendTransactionMap.get(transactionHash) == null) {
-          final BlockchainTransaction transaction =
-              BlockchainTransaction.builder()
-                  .chainType(ChainType.flow.name())
-                  .blockNumber(event.getHeight())
-                  .transactionIndex(event.getTransactionIndex())
-                  .transactionHash(transactionHash)
-                  .status(NotifyStatus.NOT_SENT.name())
-                  .build();
-          transaction.resolveIdAndKey();
-          notSendTransactionMap.put(transactionHash, transaction);
-          transactionEventsMap.put(transactionHash, new HashSet<>());
-        }
-        transactionEventsMap.get(transactionHash).add(event.getType());
-      }
-    }
-
-    // set events from set to list
-    for (final Entry<String, BlockchainTransaction> entry : notSendTransactionMap.entrySet()) {
-      entry.getValue().setEvents(new ArrayList<>(transactionEventsMap.get(entry.getKey())));
-    }
-    return new ArrayList<>(notSendTransactionMap.values());
   }
 
   @Override
