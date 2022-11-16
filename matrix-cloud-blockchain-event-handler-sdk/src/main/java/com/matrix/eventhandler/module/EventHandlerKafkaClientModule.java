@@ -234,20 +234,4 @@ public class EventHandlerKafkaClientModule {
       @Qualifier("flowConvertedEventsHistoryTopic") final NewTopic newTopic) {
     return new FlowConvertedEventHistoryKafkaClient(template, newTopic);
   }
-
-  @Bean("refreshMetadataTopic")
-  public NewTopic getRefreshMetadataTopic(
-      @Value("${topics.metadata-refresh-message-topic.name}") final String topicName,
-      @Value("${topics.metadata-refresh-message-topic.replicas}") final int topicReplicas,
-      @Value("${topics.metadata-refresh-message-topic.partitions}") final int topicPartitions) {
-    return TopicBuilder.name(topicName).partitions(topicPartitions).replicas(topicReplicas).build();
-  }
-
-  @SneakyThrows
-  @Bean("refreshMetadataKafkaClient")
-  public MetadataRefreshMessageKafkaClient getRefreshMetadataMessageClientProvider(
-      final KafkaTemplate<String, MetadataRefreshMessageDTO> template,
-      @Qualifier("refreshMetadataTopic") final NewTopic newTopic) {
-    return new MetadataRefreshMessageKafkaClient(template, newTopic);
-  }
 }

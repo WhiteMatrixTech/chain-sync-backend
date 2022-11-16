@@ -59,3 +59,11 @@ topics:
     replicas: 1
     partitions: 1
     max.request.size: 8388608
+  flow-converted-events-topic:
+    name: flow-converted-events-${STAGE:local}
+    replicas: 1
+    partitions: 1
+  flow-converted-events-history-topic:
+    name: flow-converted-events-history-${STAGE:local}
+    replicas: 1
+    partitions: 1
