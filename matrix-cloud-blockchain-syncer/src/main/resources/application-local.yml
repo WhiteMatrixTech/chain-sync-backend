@@ -1,6 +1,4 @@
 blockchain:
-  rinkeby-provider-endpoint:
-    - ${rinkeby-provider-endpoint}
   ethereum-provider-endpoint:
     - ${ethereum-provider-endpoint}
   mumbai-provider-endpoint:

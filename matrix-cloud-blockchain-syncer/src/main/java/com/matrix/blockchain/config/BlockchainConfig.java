@@ -15,9 +15,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("blockchain")
 public class BlockchainConfig {
 
-  /** rinkeby */
-  private List<String> rinkebyProviderEndpoint;
-
   /** ethereum */
   private List<String> ethereumProviderEndpoint;
 

@@ -11,14 +11,9 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 dynamodb:
-  rinkeby-event-table-name: matrix-cloud-rinkeby-event-${STAGE:local}
   mumbai-event-table-name: matrix-cloud-mumbai-event-${STAGE:local}
   ethereum-event-table-name: matrix-cloud-ethereum-event-${STAGE:local}
   polygon-event-table-name: matrix-cloud-polygon-event-${STAGE:local}
-  flow-test-net-event-table-name: matrix-cloud-flow-test-net-event-${STAGE:local}
-  flow-main-net-event-table-name: matrix-cloud-flow-main-net-event-${STAGE:local}
-  flow-test-net-transaction-table-name: matrix-cloud-flow-test-net-transaction-${STAGE:local}
-  flow-main-net-transaction-table-name: matrix-cloud-flow-main-net-transaction-${STAGE:local}
   blockchain-tip-table-name: matrix-cloud-blockchain-tip-${STAGE:local}
   sync-error-table-name: matrix-cloud-blockchain-sync-error-${STAGE:local}
   blockchain-offset-table-name: matrix-cloud-blockchain-offset-${STAGE:local}

@@ -1,10 +1,6 @@
 package com.matrix.blockchain.module;
 
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.matrix.blockchain.config.DynamoDbConfig;
-import com.matrix.blockchain.dao.FlowMainNetBlockchainTransactionDao;
-import com.matrix.blockchain.dao.FlowTestNetBlockchainTransactionDao;
-import com.matrix.blockchain.dao.TransactionTipDao;
 import com.matrix.blockchain.model.BlockFailed;
 import com.matrix.blockchain.model.BlockOffset;
 import com.matrix.blockchain.model.BlockSuccess;
@@ -28,11 +24,6 @@ public class DynamoDBModule {
 
   @Resource private DynamoDbConfig dynamoDBConfig;
 
-  @Bean(EventOrmManager.RINKEBY_EVENT_ORM_MANAGER)
-  public DynamoDBTableOrmManager<EthereumBlockEvent> getRinkebyEventOrmManager() {
-    return new AnnotatedDynamoDBTableOrmManager<>(
-        this.dynamoDBConfig.getRinkebyEventTableName(), EthereumBlockEvent.class);
-  }
 
   @Bean(EventOrmManager.ETHEREUM_EVENT_ORM_MANAGER)
   public DynamoDBTableOrmManager<EthereumBlockEvent> getEthereumEventOrmManager() {
@@ -50,30 +41,6 @@ public class DynamoDBModule {
   public DynamoDBTableOrmManager<EthereumBlockEvent> getPolygonEventOrmManager() {
     return new AnnotatedDynamoDBTableOrmManager<>(
         this.dynamoDBConfig.getPolygonEventTableName(), EthereumBlockEvent.class);
-  }
-
-  @Bean(EventOrmManager.FLOW_TEST_NET_EVENT_ORM_MANAGER)
-  public DynamoDBTableOrmManager<FlowBlockEvent> getFlowTestNetEventOrmManager() {
-    return new AnnotatedDynamoDBTableOrmManager<>(
-        this.dynamoDBConfig.getFlowTestNetEventTableName(), FlowBlockEvent.class);
-  }
-
-  @Bean(EventOrmManager.FLOW_MAIN_NET_EVENT_ORM_MANAGER)
-  public DynamoDBTableOrmManager<FlowBlockEvent> getFlowMainNetEventOrmManager() {
-    return new AnnotatedDynamoDBTableOrmManager<>(
-        this.dynamoDBConfig.getFlowMainNetEventTableName(), FlowBlockEvent.class);
-  }
-
-  @Bean(EventOrmManager.FLOW_TEST_NET_TRANSACTION_ORM_MANAGER)
-  public DynamoDBTableOrmManager<BlockchainTransaction> getFlowTestNetTransactionOrmManager() {
-    return new AnnotatedDynamoDBTableOrmManager<>(
-        this.dynamoDBConfig.getFlowTestNetTransactionTableName(), BlockchainTransaction.class);
-  }
-
-  @Bean(EventOrmManager.FLOW_MAIN_NET_TRANSACTION_ORM_MANAGER)
-  public DynamoDBTableOrmManager<BlockchainTransaction> getFlowMainNetTransactionOrmManager() {
-    return new AnnotatedDynamoDBTableOrmManager<>(
-        this.dynamoDBConfig.getFlowMainNetTransactionTableName(), BlockchainTransaction.class);
   }
 
   @Bean("blockchainTipOrmManager")
@@ -104,17 +71,5 @@ public class DynamoDBModule {
   public DynamoDBTableOrmManager<SyncError> getSyncErrorOrmManager() {
     return new AnnotatedDynamoDBTableOrmManager<>(
         this.dynamoDBConfig.getSyncErrorTableName(), SyncError.class);
-  }
-
-  @Bean("flowTestNetBlockchainTransactionDao")
-  public FlowTestNetBlockchainTransactionDao getFlowTestNetBlockchainTransactionDao(
-      final DynamoDB dynamoDB) {
-    return new FlowTestNetBlockchainTransactionDao(getFlowTestNetTransactionOrmManager(), dynamoDB);
-  }
-
-  @Bean("flowMainNetBlockchainTransactionDao")
-  public FlowMainNetBlockchainTransactionDao flowMainNetBlockchainTransactionDao(
-      final DynamoDB dynamoDB) {
-    return new FlowMainNetBlockchainTransactionDao(getFlowMainNetTransactionOrmManager(), dynamoDB);
   }
 }

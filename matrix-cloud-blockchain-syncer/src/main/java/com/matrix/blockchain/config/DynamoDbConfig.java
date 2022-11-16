@@ -15,10 +15,6 @@ public class DynamoDbConfig {
   private String mumbaiEventTableName;
   private String ethereumEventTableName;
   private String polygonEventTableName;
-  private String flowTestNetEventTableName;
-  private String flowMainNetEventTableName;
-  private String flowTestNetTransactionTableName;
-  private String flowMainNetTransactionTableName;
   private String blockchainTipTableName;
   private String syncErrorTableName;
   private String blockchainOffsetTableName;

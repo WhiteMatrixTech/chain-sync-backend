@@ -5,8 +5,6 @@ package com.matrix.blockchain.model;
  */
 public class EventOrmManager {
 
-  public static final String RINKEBY_EVENT_ORM_MANAGER = "rinkebyEventOrmManager";
-
   public static final String ETHEREUM_EVENT_ORM_MANAGER = "ethereumEventOrmManager";
 
   public static final String MUMBAI_EVENT_ORM_MANAGER = "mumbaiEventOrmManager";
