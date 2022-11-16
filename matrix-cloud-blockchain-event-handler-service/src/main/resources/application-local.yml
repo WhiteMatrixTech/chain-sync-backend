@@ -1,0 +1,26 @@
+phantaBear:
+  address: "0xA9D29DB8B0A2e87482B7D2EaD732aaf161dAC3D9"
+  metadata:
+    endpoint: http://localhost:8081/metadata/api/v1/nft
+phancyPet:
+  address: "0x554478E4c47EF61806fab268d1B74543d4D01f91"
+  metadata:
+    endpoint: http://localhost:8081/metadata/api/v1/nft
+oneSync:
+  metadata:
+    endpoint: http://localhost:8083/metadata/api
+metadata:
+  enrollment-endpoint: http://127.0.0.1:8083/metadata/api
+topics:
+  rinkeby-event-log-topic:
+    name: rinkeby-blockchain-event-log-local
+  mumbai-event-log-topic:
+    name: mumbai-blockchain-event-log-local
+  ethereum-event-log-topic:
+    name: ethereum-blockchain-event-log-local
+  polygon-event-log-topic:
+    name: polygon-blockchain-event-log-local
+grpc:
+  client:
+    matrix-cloud-theirsverse-service:
+      address: 'static://localhost:9090'

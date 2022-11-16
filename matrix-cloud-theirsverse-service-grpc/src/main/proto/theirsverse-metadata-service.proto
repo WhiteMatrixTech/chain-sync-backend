@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package com.matrix.theirsverse.model;
+
+option java_multiple_files = true;
+option java_package = "com.matrix.theirsverse.model";
+option java_outer_classname = "TheirsverseMetadataServiceProto";
+
+service TheirsverseMetadataService {
+  rpc queryMetadata (QueryMetadataRequestDTO) returns (QueryMetadataResponseDTO) {
+  }
+  rpc batchGetUserAsserts (BatchGetUserAssertsRequestDTO) returns (BatchGetUserAssertsResponseDTO) {
+  }
+  rpc calculateScore (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  }
+  rpc changeOwnership (ChangeOwnershipRequestDTO) returns (google.protobuf.Empty) {
+  }
+  rpc enterCapsule (EnterCapsuleRequestDTO) returns (google.protobuf.Empty) {
+  }
+  rpc leaveCapsule (EnterCapsuleRequestDTO) returns (google.protobuf.Empty) {
+  }
+}
+
+service TheirsverseRedeemService {
+  rpc redeemItem (RedeemItemRequestDTO) returns (google.protobuf.Empty) {
+  }
+  rpc queryOrders (QueryOrdersRequestDTO) returns (QueryOrdersResponseDTO) {
+  }
+  rpc getRedeemableItem (GetRedeemableItemRequestDTO) returns (RedeemableItemResponse) {
+  }
+  rpc queryRedeemableItems (google.protobuf.Empty) returns (QueryRedeemableItemsResponseDTO) {
+  }
+  rpc addRedeemableItem (AddRedeemableItemRequestDTO) returns (google.protobuf.Empty) {
+  }
+  rpc editRedeemableItem (EditRedeemableItemRequestDTO) returns (google.protobuf.Empty) {
+  }
+  rpc deleteRedeemableItem (DeleteRedeemableItemRequestDTO) returns (google.protobuf.Empty) {
+  }
+}
+
+message RedeemItemRequestDTO {
+  string userId = 1;
+  string itemId = 2;
+}
+
+message QueryOrdersRequestDTO {
+  bool nextPage = 1;
+  optional int32 limit = 2;
+  optional string nextKey = 3;
+  optional string prevKey = 4;
+}
+
+
+message QueryOrdersResponseDTO {
+  repeated OrderResponse order = 1;
+  optional string prevKey = 2;
+  optional string nextKey = 3;
+}
+
+message OrderResponse {
+  string userId = 1;
+  string createAt = 2;
+  string username = 3;
+  string itemName = 4;
+  string recipientName = 5;
+  string country = 6;
+  string addressLine = 7;
+  string city = 8;
+  string region = 9;
+  string postCode = 10;
+}
+
+message QueryRedeemableItemsResponseDTO {
+  repeated RedeemableItemResponse redeemableItem = 1;
+  optional string prevKey = 2;
+  optional string nextKey = 3;
+}
+
+message GetRedeemableItemRequestDTO {
+  string itemId = 1;
+}
+
+message DeleteRedeemableItemRequestDTO {
+  string itemId = 1;
+}
+
+message AddRedeemableItemRequestDTO {
+  string name = 2;
+  optional string description = 3;
+  optional string banner = 4;
+  optional string image1 = 5;
+  optional string image2 = 6;
+  optional string image3 = 7;
+  int32 score = 8;
+  int32 amount = 9;
+  optional string size = 10;
+  optional string redeemStartTime = 11;
+  optional string redeemEndTime = 12;
+}
+
+message EditRedeemableItemRequestDTO {
+  string itemId = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional string banner = 4;
+  optional string image1 = 5;
+  optional string image2 = 6;
+  optional string image3 = 7;
+  optional int32 score = 8;
+  optional int32 amount = 9;
+  optional string size = 10;
+  optional string redeemStartTime = 11;
+  optional string redeemEndTime = 12;
+}
+
+message RedeemableItemResponse {
+  string itemId = 1;
+  string name = 2;
+  string description = 3;
+  string banner = 4;
+  string image1 = 5;
+  string image2 = 6;
+  string image3 = 7;
+  int32 score = 8;
+  int32 amount = 9;
+  string size = 10;
+  string redeemStartTime = 11;
+  string redeemEndTime = 12;
+  string createAt = 13;
+}
+
+message BatchGetUserAssertsRequestDTO {
+  repeated string userId = 1;
+}
+
+message BatchGetUserAssertsResponseDTO {
+  repeated AssertsInfo assertsInfo = 1;
+}
+
+message AssertsInfo {
+  string userId = 1;
+  int32 inCapsuleAmount = 2;
+  int32 notCapsuledAmount = 3;
+}
+
+message QueryMetadataRequestDTO {
+  string owner = 1;
+}
+
+message QueryMetadataResponseDTO {
+  repeated TheirsverseMetadata theirsverseMetadata = 1;
+}
+
+message TheirsverseMetadata {
+  string contractAddress = 1;
+  int32 tokenId = 2;
+  string name = 3;
+  string description = 4;
+  string owner = 5;
+  int64 blockNumber = 6;
+  string image = 7;
+  string animationUrl = 8;
+  string backgroundColor = 9;
+  repeated Attribute attributes = 10;
+  CapsuleStatus capsuleStatus = 11;
+  string enterCapsuleTime = 12;
+}
+
+message Attribute {
+  string traitName = 1;
+  string value = 2;
+}
+
+enum CapsuleStatus {
+  InCapsule = 0;
+  NotCapsuled = 1;
+}
+
+message ChangeOwnershipRequestDTO {
+  string contractAddress = 1;
+  bytes tokenId = 2;
+  string from = 3;
+  string to = 4;
+  int64 blockNumber = 5;
+}
+
+message EnterCapsuleRequestDTO {
+  string userId = 1;
+  repeated int32 tokenId = 2;
+}
