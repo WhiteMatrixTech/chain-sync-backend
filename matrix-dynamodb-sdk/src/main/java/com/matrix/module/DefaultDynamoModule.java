@@ -1,5 +1,6 @@
 package com.matrix.module;
 
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
@@ -14,13 +15,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DefaultDynamoModule {
 
+  @Value("${spring.profiles.active:local}")
+  private String profile;
+
   @Value("${cloud.aws.region.static:ap-northeast-1}")
   private String region;
 
   @Bean
   @ConditionalOnMissingBean
   public AmazonDynamoDB amazonDynamoDB() {
-    return AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
+    if (!"local".equals(profile)) {
+      return AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
+    } else {
+      return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
+          new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", region)).build();
+    }
   }
 
   @Bean

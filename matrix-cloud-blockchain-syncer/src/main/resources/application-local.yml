@@ -1,6 +1,6 @@
 blockchain:
   ethereum-provider-endpoint:
-    - https://mainnet.infura.io/v3/8326a4364eaf4935ad37c29fe9f6995f
+    - https://eth-mainnet.g.alchemy.com/v2/yoJCyg5XsbdD9u072GIASQJqNNYdpJlW
   mumbai-provider-endpoint:
     - https://polygon-mumbai.g.alchemy.com/v2/AaK0qSuDMI4PT_9VFm4aa1IL1aYecJmT
   polygon-provider-endpoint:
