@@ -6,12 +6,12 @@ import com.matrix.blockchain.model.BlockOffset;
 import com.matrix.blockchain.model.BlockSuccess;
 import com.matrix.blockchain.model.BlockTip;
 import com.matrix.blockchain.model.EthereumBlockEvent;
+import com.matrix.blockchain.model.EthereumBlockTransaction;
 import com.matrix.blockchain.model.EventOrmManager;
-import com.matrix.blockchain.model.FlowBlockEvent;
+import com.matrix.blockchain.model.EthereumBlockInfo;
 import com.matrix.blockchain.model.SyncError;
 import com.matrix.dynamodb.orm.DynamoDBTableOrmManager;
 import com.matrix.dynamodb.orm.impl.AnnotatedDynamoDBTableOrmManager;
-import com.matrix.marketplace.blockchain.model.BlockchainTransaction;
 import javax.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -72,4 +72,17 @@ public class DynamoDBModule {
     return new AnnotatedDynamoDBTableOrmManager<>(
         this.dynamoDBConfig.getSyncErrorTableName(), SyncError.class);
   }
+
+  @Bean("ethereumBlockInfoOrmManager")
+  public DynamoDBTableOrmManager<EthereumBlockInfo> getEthereumBlockInfoOrmManager() {
+    return new AnnotatedDynamoDBTableOrmManager<>(
+        this.dynamoDBConfig.getBlockInfoTableName(), EthereumBlockInfo.class);
+  }
+
+  @Bean("ethereumBlockTransactionOrmManager")
+  public DynamoDBTableOrmManager<EthereumBlockTransaction> getEthereumBlockTransactionOrmManager() {
+    return new AnnotatedDynamoDBTableOrmManager<>(
+        this.dynamoDBConfig.getBlockTransactionTableName(), EthereumBlockTransaction.class);
+  }
+
 }

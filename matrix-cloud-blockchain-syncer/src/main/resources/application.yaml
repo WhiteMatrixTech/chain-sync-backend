@@ -19,6 +19,8 @@ dynamodb:
   blockchain-offset-table-name: matrix-cloud-blockchain-offset-${STAGE:local}
   block-success-table-name: matrix-cloud-block-success
   block-failed-table-name: matrix-cloud-block-failed-${STAGE:local}
+  block-info-table-name: matrix-cloud-etl-ethereum-block-info-${STAGE:local}
+  block-transaction-table-name: matrix-cloud-etl-ethereum-block-transaction-${STAGE:local}
 cloud:
   aws:
     region:

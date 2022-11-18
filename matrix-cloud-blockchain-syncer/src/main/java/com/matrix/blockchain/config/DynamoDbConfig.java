@@ -20,4 +20,6 @@ public class DynamoDbConfig {
   private String blockchainOffsetTableName;
   private String blockSuccessTableName;
   private String blockFailedTableName;
+  private String blockInfoTableName;
+  private String blockTransactionTableName;
 }
