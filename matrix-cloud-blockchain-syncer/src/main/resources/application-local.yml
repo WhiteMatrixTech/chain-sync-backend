@@ -1,11 +1,11 @@
 blockchain:
   ethereum-provider-endpoint:
-    - https://eth-mainnet.g.alchemy.com/v2/yoJCyg5XsbdD9u072GIASQJqNNYdpJlW
+    - ${ethereum-provider-endpoint}
   mumbai-provider-endpoint:
-    - https://polygon-mumbai.g.alchemy.com/v2/AaK0qSuDMI4PT_9VFm4aa1IL1aYecJmT
+    - ${mumbai-provider-endpoint}
   polygon-provider-endpoint:
-    - https://polygon-mainnet.g.alchemy.com/v2/LAVH4Qsdw9CiY0VsTJZiztl1IQCJKt5D
-cloudfrontUrl: https://dj2mwotxs0n3u.cloudfront.net
+    - ${polygon-provider-endpoint}
+cloudfrontUrl: https://{your-cloud-front-url}
 spring:
   redis:
     host: localhost
