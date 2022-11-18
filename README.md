@@ -13,7 +13,6 @@ cd dynamodb
 docker-compose up -d
 ```
 
-
 (optional) 验证dynamodb-local是否安装成功
 
 ```
@@ -34,8 +33,8 @@ DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin
 打开表matrix-cloud-blockchain-tip-local，添加如下对象
 
 {
-  "chainId": "mainnet_ethereum",
-  "blockNumber": 15988116
+"chainId": "mainnet_ethereum",
+"blockNumber": 15988116
 }
 
 ![](matrix-cloud-blockchain-tip-local.png)
@@ -70,3 +69,15 @@ docker-compose up -d
 ```
 
 (optional) 验证s3-local是否安装成功
+
+### 安装redis-local
+
+```
+cd redis
+docker-compose up -d
+```
+
+### 申请 ethereum network endpoint
+
+可以去https://www.alchemy.com/ 或者 https://www.infura.io/ 创建app并获取endpoint然后填入
+matrix-cloud-blockchain-syncer 中application-local下的blockchain:ethereum-provider-endpoint
