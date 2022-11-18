@@ -1,11 +1,5 @@
 spring:
   kafka:
     properties:
-      security:
-        protocol: SASL_SSL
       bootstrap:
-        servers: b-2-public.matrixalpha.xp4f5j.c4.kafka.ap-northeast-1.amazonaws.com:9198,b-3-public.matrixalpha.xp4f5j.c4.kafka.ap-northeast-1.amazonaws.com:9198,b-1-public.matrixalpha.xp4f5j.c4.kafka.ap-northeast-1.amazonaws.com:9198
-      sasl:
-        mechanism: AWS_MSK_IAM
-        jaas.config: software.amazon.msk.auth.iam.IAMLoginModule   required;
-        client.callback.handler.class: software.amazon.msk.auth.iam.IAMClientCallbackHandler
+        servers: localhost:9092
