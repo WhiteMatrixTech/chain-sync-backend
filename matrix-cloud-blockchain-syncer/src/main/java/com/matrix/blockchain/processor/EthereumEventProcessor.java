@@ -1,6 +1,8 @@
 package com.matrix.blockchain.processor;
 
 import com.matrix.blockchain.constants.Constants;
+import com.matrix.blockchain.dao.EthereumBlockInfoDao;
+import com.matrix.blockchain.dao.EthereumBlockTransactionDao;
 import com.matrix.blockchain.model.BlockEvent;
 import com.matrix.blockchain.model.BlockRange;
 import com.matrix.blockchain.model.BlockTip;
@@ -40,6 +42,10 @@ public class EthereumEventProcessor extends CommonEventProcessor {
 
   @Resource private Map<String, BaseQueryDao<EthereumBlockEvent>> ethBlockEventDaoMap;
 
+  @Resource private EthereumBlockInfoDao ethereumBlockInfoDao;
+
+  @Resource private EthereumBlockTransactionDao ethereumBlockTransactionDao;
+
   @Override
   public List<BlockEvent> process(BlockRange blockRange) {
     try {
@@ -70,6 +76,12 @@ public class EthereumEventProcessor extends CommonEventProcessor {
           filterAndConvertEvents(
               blockMap, logs, super.getEventMap(ethBlockEventDao, blockRange), blockRange);
       super.persistentEvents(ethBlockEventDao, blockRange, events);
+
+      // persistent blocks info into ddb
+      super.persistentBlocks(ethereumBlockInfoDao, blockRange, blockMap);
+
+      // persistent transaction info into ddb
+      super.persistentTransactions(ethereumBlockTransactionDao, blockRange, blockMap);
 
       // step 3. notify through mq
       super.notifyEvents(blockRange, events);

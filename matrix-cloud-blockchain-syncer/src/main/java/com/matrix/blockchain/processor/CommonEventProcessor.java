@@ -21,6 +21,8 @@ import com.matrix.blockchain.model.BlockList;
 import com.matrix.blockchain.model.BlockRange;
 import com.matrix.blockchain.model.BlockSuccess;
 import com.matrix.blockchain.model.BlockchainType;
+import com.matrix.blockchain.model.EthereumBlockInfo;
+import com.matrix.blockchain.model.EthereumBlockTransaction;
 import com.matrix.blockchain.model.FailedBlock;
 import com.matrix.blockchain.model.GetTransactionEventsRequest;
 import com.matrix.blockchain.model.GetTransactionEventsResponse;
@@ -48,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -56,6 +59,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.EthBlock.TransactionObject;
+import org.web3j.protocol.core.methods.response.EthBlock.TransactionResult;
+import org.web3j.protocol.core.methods.response.Transaction;
 import schedule.proto.Block;
 
 /**
@@ -127,6 +134,77 @@ public class CommonEventProcessor implements EventProcessor {
         blockRange.getFrom(),
         blockRange.getTo(),
         events.size(),
+        System.currentTimeMillis() - start);
+  }
+
+  public void persistentBlocks(
+      final BaseQueryDao queryDao, final BlockRange blockRange, final Map<Long, EthBlock.Block> blockMap) {
+    long start = System.currentTimeMillis();
+    if (!CollectionUtils.isEmpty(blockMap)) {
+      blockMap.values().parallelStream().forEach(block -> {
+        queryDao.putItem(EthereumBlockInfo.builder()
+            .blockNumber(block.getNumber().longValue())
+                .hash(block.getTimestampRaw())
+                .parentHash(block.getParentHash())
+                .timestamp(block.getTimestampRaw())
+                .nonce(block.getNonceRaw())
+                .sha3Uncles(block.getSha3Uncles())
+                .logsBloom(block.getLogsBloom())
+                .transactionsRoot(block.getTransactionsRoot())
+                .stateRoot(block.getStateRoot())
+                .receiptsRoot(block.getReceiptsRoot())
+                .miner(block.getMiner())
+                .difficulty(block.getDifficultyRaw())
+                .totalDifficulty(block.getTotalDifficultyRaw())
+                .size(block.getSizeRaw())
+                .extraData(block.getExtraData())
+                .gasLimit(block.getGasLimitRaw())
+                .gasUsed(block.getGasUsedRaw())
+                .transactionCount(block.getTransactions().size())
+                .baseFeePerGas(block.getBaseFeePerGasRaw())
+            .build());
+      });
+    }
+
+    log.info(
+        "success persistent blocks, chainId: {}, range from: {} to: {}, final size: {}, cost: {} mills",
+        blockRange.getChainId(),
+        blockRange.getFrom(),
+        blockRange.getTo(),
+        blockMap.size(),
+        System.currentTimeMillis() - start);
+  }
+
+  public void persistentTransactions(
+      final BaseQueryDao queryDao, final BlockRange blockRange, final Map<Long, EthBlock.Block> blockMap) {
+    long start = System.currentTimeMillis();
+    if (!CollectionUtils.isEmpty(blockMap)) {
+      List<TransactionObject> transactionObjects = blockMap.values().stream()
+          .map(EthBlock.Block::getTransactions).collect(Collectors.toList()).stream()
+          .flatMap(List::stream).collect(Collectors.toList())
+          .stream().map(TransactionObject.class::cast)
+          .collect(Collectors.toList());
+      transactionObjects.parallelStream().forEach(transactionObject -> queryDao.putItem(EthereumBlockTransaction.builder()
+          .blockNumber(transactionObject.getBlockNumber().longValue())
+          .transactionHash(transactionObject.getHash())
+          .nonce(transactionObject.getNonceRaw())
+          .transactionIndex(transactionObject.getTransactionIndexRaw())
+          .fromAddress(transactionObject.getFrom())
+          .toAddress(transactionObject.getTo())
+          .value(transactionObject.getValueRaw())
+          .gas(transactionObject.getGasRaw())
+          .gasPrice(transactionObject.getGasPriceRaw())
+          .input(transactionObject.getInput())
+          .blockHash(transactionObject.getBlockHash())
+          .build()));
+    }
+
+    log.info(
+        "success persistent blocks, chainId: {}, range from: {} to: {}, final size: {}, cost: {} mills",
+        blockRange.getChainId(),
+        blockRange.getFrom(),
+        blockRange.getTo(),
+        blockMap.size(),
         System.currentTimeMillis() - start);
   }
 
@@ -230,6 +308,11 @@ public class CommonEventProcessor implements EventProcessor {
   protected String getEventDataS3Key(
       final String chainType, final String txHash, final Long logIndex) {
     return chainType + CONNECTOR + txHash + CONNECTOR + logIndex;
+  }
+
+  protected String getBlockDataS3Key(
+      final String chainType, final String blockNumber) {
+    return chainType + CONNECTOR + blockNumber;
   }
 
   protected void notifyTransactions(
