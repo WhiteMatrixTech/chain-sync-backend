@@ -1,23 +1,24 @@
 # matrix-cloud-ETL
 
-java环境为jdk11
 
-gradle版本使用每个文件夹内的gradle/gradle-wrapper.properties
+The Java environment is jdk11
 
-## run locally
+The Gradle version uses gradle/gradle-wrapper.properties inside each folder
 
-通过docker和docker-compose安装必要本地环境
+## Run locally
 
-docker-compose仓库：https://github.com/WhiteMatrixTech/dev-in-docker
+Install the necessary local environment through docker and docker-compose
 
-### 安装dynamodb-local
+docker-compose repository address：https://github.com/WhiteMatrixTech/dev-in-docker
+
+### Install DynamoDB local
 
 ```
 cd dynamodb
 docker-compose up -d
 ```
 
-(optional) 验证dynamodb-local是否安装成功
+Verify that dynamodb-local is installed successfully (optional) 
 
 ```
 npm install -g dynamodb-admin
@@ -30,14 +31,14 @@ dynamodb-admin
 DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin
 ```
 
-安装成功后浏览器打开http://localhost:8001
+After the installation is successful, the browser opens http://localhost:8001
 
 
-如果启动SyncerApplication后可以看到如下表的信息
+If you start SyncerApplication, you can see the information in the following table
 
 ![](dynamodb-admin.png)
 
-打开表matrix-cloud-blockchain-tip-local，添加如下对象
+Open the table matrix-cloud-blockchain-tip-local and add the following objects:
 
 {
 "chainId": "mainnet_ethereum",
@@ -46,51 +47,50 @@ DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin
 
 ![](matrix-cloud-blockchain-tip-local.png)
 
-### 安装kafka-local
+### Install a local Apache Kafka
 
 ```
 cd kafka
 
-//按readme中修改参数
+//Modify parameters according to readme
 
 docker-compose up -d
 ```
 
-(optional) 验证kafka-local是否安装成功
+Verify that kafka-local is installed successfully (optional) 
 
-根据平台下载并安装kafkatool：https://www.kafkatool.com/download.html
+Download and install kafka tool according to the platform：https://www.kafkatool.com/download.html
 
-连接配置
+Connection configuration
 
 ![](kafka-viewer-config.png)
 
-启动SyncerApplication后可以看到如下topic的信息
+After starting SyncerApplication, you can see the following information
 
 ![](kafka-viewer.png)
 
-### 安装s3-local
+### Install s3-local
 
 ```
 cd s3
 docker-compose up -d
 ```
 
-(optional) 验证s3-local是否安装成功
+Verify that s3-local is installed successfully (optional)
 
-### 安装redis-local
+### Install Redis locally
 
 ```
 cd redis
 docker-compose up -d
 ```
 
-### 申请 ethereum network endpoint
+### Apply for Ethereum network endpoint
 
-可以去https://www.alchemy.com/ 或者 https://www.infura.io/ 创建app并获取endpoint然后填入
-matrix-cloud-blockchain-syncer 中application-local下的blockchain:ethereum-provider-endpoint
+Visit https://www.alchemy.com/ or https://www.infura.io/ to create an app and get the endpoint and fill it in blockchain:ethereum-provider-endpoint under application-local in matrix-cloud-blockchain-syncer.
 
-## 启动Syncer服务
+## Start the Syncer service
 
-如果本地环境中没有aws相关配置，在环境变量中设置AWS_ACCESS_KEY_ID=123;AWS_SECRET_KEY=123以跳过aws检查
+If there is no AWS-related configuration in the local environment, set AWS_ACCESS_KEY_ID=123; AWS_SECRET_KEY=123 in the environment variable to skip the AWS check.
 
-使用IDEA打开matrix-cloud-blockchain-syncer文件夹，启动matrix-cloud-blockchain-syncer下的SyncerApplication服务
+Use IDEA to open the matrix-cloud-blockchain-syncer folder and start the SyncerApplication service under matrix-cloud-blockchain-syncer.
