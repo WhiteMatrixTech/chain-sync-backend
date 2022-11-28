@@ -13,3 +13,4 @@ spring:
 dynamodb:
   nft-collection-name: matrix-cloud-nft-collection-${STAGE:local}
   blockchain-contract-template-table-name: matrix-cloud-blockchain-contract-template-${STAGE:local}
+  token-table-name: matrix-cloud-token-${STAGE:local}

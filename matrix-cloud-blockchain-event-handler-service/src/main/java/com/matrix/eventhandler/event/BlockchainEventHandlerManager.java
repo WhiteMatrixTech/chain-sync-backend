@@ -43,6 +43,10 @@ public class BlockchainEventHandlerManager {
     }
   }
 
+  public List<BlockchainEventHandler> getBlockchainEventHandlers() {
+    return blockchainEventHandlers;
+  }
+
   @PostConstruct
   void setup() {
     log.info(

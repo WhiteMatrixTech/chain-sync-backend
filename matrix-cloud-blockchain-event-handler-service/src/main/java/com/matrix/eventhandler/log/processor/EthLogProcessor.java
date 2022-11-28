@@ -40,7 +40,13 @@ public class EthLogProcessor implements BlockchainLogProcessor {
     final List<AbiEnhancedEvent> abiEvent = abiEnhancedEventManager.getAbiEvent(ethereumAddress);
     return abiEvent.stream()
         .anyMatch(
-            abiEnhancedEvent -> abiEnhancedEvent.isLogMatched(blockChainLog.getTopics().get(0)));
+            abiEnhancedEvent -> {
+              if (abiEnhancedEvent.getName().equals("Transfer")
+                  && blockChainLog.getTopics().size() != 4) {
+                return false;
+              }
+              return abiEnhancedEvent.isLogMatched(blockChainLog.getTopics().get(0));
+            });
   }
 
   @Override
