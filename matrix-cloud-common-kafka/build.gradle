@@ -29,9 +29,9 @@ dependencyManagement {
 }
 
 dependencies {
-    api 'software.amazon.msk:aws-msk-iam-auth:1.1.4'
-    api 'com.amazonaws:aws-java-sdk-sts:1.12.141'
-    api 'software.amazon.glue:schema-registry-serde:1.1.12'
+//    api 'software.amazon.msk:aws-msk-iam-auth:1.1.4'
+//    api 'com.amazonaws:aws-java-sdk-sts:1.12.141'
+//    api 'software.amazon.glue:schema-registry-serde:1.1.12'
     api 'io.confluent:kafka-streams-avro-serde:7.0.1'
 }
 
