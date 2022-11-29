@@ -1,14 +1,15 @@
 package com.matrix.blockchain.module;
 
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.matrix.blockchain.config.DynamoDbConfig;
+import com.matrix.blockchain.dao.ETHTransactionDao;
 import com.matrix.blockchain.model.BlockFailed;
 import com.matrix.blockchain.model.BlockOffset;
 import com.matrix.blockchain.model.BlockSuccess;
 import com.matrix.blockchain.model.BlockTip;
 import com.matrix.blockchain.model.EthereumBlockEvent;
-import com.matrix.blockchain.model.EthereumBlockTransaction;
-import com.matrix.blockchain.model.EventOrmManager;
 import com.matrix.blockchain.model.EthereumBlockInfo;
+import com.matrix.blockchain.model.EventOrmManager;
 import com.matrix.blockchain.model.SyncError;
 import com.matrix.dynamodb.orm.DynamoDBTableOrmManager;
 import com.matrix.dynamodb.orm.impl.AnnotatedDynamoDBTableOrmManager;
@@ -23,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
 public class DynamoDBModule {
 
   @Resource private DynamoDbConfig dynamoDBConfig;
-
 
   @Bean(EventOrmManager.ETHEREUM_EVENT_ORM_MANAGER)
   public DynamoDBTableOrmManager<EthereumBlockEvent> getEthereumEventOrmManager() {
@@ -79,10 +79,8 @@ public class DynamoDBModule {
         this.dynamoDBConfig.getBlockInfoTableName(), EthereumBlockInfo.class);
   }
 
-  @Bean("ethereumBlockTransactionOrmManager")
-  public DynamoDBTableOrmManager<EthereumBlockTransaction> getEthereumBlockTransactionOrmManager() {
-    return new AnnotatedDynamoDBTableOrmManager<>(
-        this.dynamoDBConfig.getBlockTransactionTableName(), EthereumBlockTransaction.class);
+  @Bean
+  public ETHTransactionDao ethTransactionDao(final DynamoDB dynamoDB) {
+    return new ETHTransactionDao(dynamoDBConfig.getEthTransactionTableName(), dynamoDB);
   }
-
 }

@@ -1,0 +1,30 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /etl/api
+spring:
+  application:
+    name: ETLQuery
+  profiles:
+    active: ${STAGE:local}
+    include: metadata-grpc
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+knife4j:
+  enable: true
+dynamodb:
+  task-def-table-name: matrix-cloud-task-def-${STAGE:local}
+  task-table-name: matrix-cloud-task-${STAGE:local}
+  token-table-name: matrix-cloud-token-${STAGE:local}
+  eth-transaction-table-name: matrix-cloud-eth-transaction-${STAGE:local}
+  ethereum-event-table-name: matrix-cloud-ethereum-event-${STAGE:local}
+cloud:
+  aws:
+    region:
+      static: ap-northeast-1
+s3:
+  bucket: marketplace-blockchain-${STAGE:local}
+  event:
+    flow:
+      bucket: marketplace-event-fetcher

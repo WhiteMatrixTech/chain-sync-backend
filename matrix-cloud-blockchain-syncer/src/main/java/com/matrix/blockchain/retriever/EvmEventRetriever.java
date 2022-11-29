@@ -119,7 +119,7 @@ public class EvmEventRetriever {
     Map<Long, Block> blockMap = new HashMap<>();
     for (DefaultBlockParameterNumber blockParameterNumber : blockParameterNumbers) {
       EthBlock block =
-          web3jContainer.getWeb3j().ethGetBlockByNumber(blockParameterNumber, false).send();
+          web3jContainer.getWeb3j().ethGetBlockByNumber(blockParameterNumber, true).send();
 
       if (block.getError() != null) {
         throw new SyncFailedException(block.getError().getMessage());
@@ -129,7 +129,7 @@ public class EvmEventRetriever {
       if (web3jSize > 1) {
         int retryTimes = 0;
         while (++retryTimes < web3jSize && block.getBlock() == null) {
-          block = web3jContainer.getWeb3j().ethGetBlockByNumber(blockParameterNumber, false).send();
+          block = web3jContainer.getWeb3j().ethGetBlockByNumber(blockParameterNumber, true).send();
         }
       }
       if (block.getBlock() == null) {

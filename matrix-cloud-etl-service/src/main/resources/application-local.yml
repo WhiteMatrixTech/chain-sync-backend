@@ -1,0 +1,8 @@
+dynamodb:
+  token-table-name: matrix-cloud-token-alpha-mainnet
+  ethereum-event-table-name: matrix-cloud-ethereum-event-alpha
+grpc:
+  client:
+    matrix-cloud-marketplace-metadata-service:
+      address: 'static://localhost:9094'
+      negotiationType: 'PLAINTEXT'

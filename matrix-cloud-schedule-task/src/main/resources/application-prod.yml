@@ -1,6 +1,0 @@
-spring:
-  redis:
-    host: ${redis_url_alpha}
-    port: 6379
-    password: ${redis_password_alpha}
-    database: 1
