@@ -1,6 +1,5 @@
-dynamodb:
-  token-table-name: matrix-cloud-token-alpha-mainnet
-  ethereum-event-table-name: matrix-cloud-ethereum-event-alpha
+server:
+  port: 8082
 grpc:
   client:
     matrix-cloud-marketplace-metadata-service:
