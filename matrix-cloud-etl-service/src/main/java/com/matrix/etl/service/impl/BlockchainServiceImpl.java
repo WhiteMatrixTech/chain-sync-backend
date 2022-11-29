@@ -6,6 +6,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.protobuf.Empty;
 import com.matrix.blockchain.dao.ETHTransactionDao;
 import com.matrix.blockchain.model.BlockTransaction;
 import com.matrix.dynamodb.model.CursorQuerySpec;
@@ -29,6 +30,8 @@ import com.matrix.etl.model.response.QueryHandlerResponse;
 import com.matrix.etl.model.response.QueryTaskResponse;
 import com.matrix.etl.model.response.QueryTransactionResponse;
 import com.matrix.etl.service.BlockchainService;
+import com.matrix.eventhandler.model.BlockchainEventHandlerServiceGrpc.BlockchainEventHandlerServiceBlockingStub;
+import com.matrix.eventhandler.model.BlockchainEventHandlers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +43,7 @@ import javax.annotation.Resource;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 /**
@@ -56,6 +60,9 @@ public class BlockchainServiceImpl implements BlockchainService {
   @Resource ETHTransactionDao ethTransactionDao;
 
   @Resource EthereumBlockEventDao ethereumBlockEventDao;
+
+  @GrpcClient("matrix-cloud-blockchain-event-handler-service")
+  BlockchainEventHandlerServiceBlockingStub blockchainEventHandlerServiceBlockingStub;
 
   static Gson GSON = new Gson();
 
@@ -115,78 +122,54 @@ public class BlockchainServiceImpl implements BlockchainService {
 
   @Override
   public QueryHandlerResponse queryHandler() {
-    final List<SimpleHandler> handlers = new ArrayList<>();
-    handlers.add(
-        SimpleHandler.builder()
-            .blockchain(ChainType.ethereum)
-            .handlerName("OneSyncEnrollmentEventHandler")
-            .type(HandlerType.CUSTOM)
-            .build());
-    handlers.add(
-        SimpleHandler.builder()
-            .blockchain(ChainType.ethereum)
-            .handlerName("OneSyncNotifierEventHandler")
-            .type(HandlerType.CUSTOM)
-            .build());
-    handlers.add(
-        SimpleHandler.builder()
-            .blockchain(ChainType.ethereum)
-            .handlerName("OneSyncTokenOwnershipUpdateEventHandler")
-            .type(HandlerType.CUSTOM)
-            .build());
-    handlers.add(
-        SimpleHandler.builder()
-            .blockchain(ChainType.ethereum)
-            .handlerName("BlockchainEventHandler")
-            .type(HandlerType.DEFAULT)
-            .build());
-    handlers.add(
-        SimpleHandler.builder()
-            .blockchain(ChainType.ethereum)
-            .handlerName("PhantaBearEventHandler")
-            .type(HandlerType.CUSTOM)
-            .build());
-    handlers.add(
-        SimpleHandler.builder()
-            .blockchain(ChainType.ethereum)
-            .handlerName("PhantaDogEventHandler")
-            .type(HandlerType.CUSTOM)
-            .build());
-    handlers.add(
-        SimpleHandler.builder()
-            .blockchain(ChainType.ethereum)
-            .handlerName("TheirsverseTransferEventHandler")
-            .type(HandlerType.CUSTOM)
-            .build());
-    return QueryHandlerResponse.builder().handlers(handlers).build();
+    final BlockchainEventHandlers eventHandlers =
+        blockchainEventHandlerServiceBlockingStub.getHandlers(Empty.getDefaultInstance());
+    return QueryHandlerResponse.builder()
+        .handlers(
+            eventHandlers.getHandlersList().stream()
+                .map(
+                    handler ->
+                        SimpleHandler.builder()
+                            .blockchain(ChainType.ethereum)
+                            .handlerName(handler.getName())
+                            .type(
+                                "Default".equals(handler.getGroup())
+                                    ? HandlerType.DEFAULT
+                                    : HandlerType.CUSTOM)
+                            .build())
+                .collect(Collectors.toList()))
+        .build();
   }
 
   @Override
   public QueryAppResponse queryApp() {
-    final List<SimpleApp> apps = new ArrayList<>();
-    apps.add(
-        SimpleApp.builder()
-            .blockchain(ChainType.ethereum)
-            .appName("OneSync")
-            .handlers(
-                List.of(
-                    "OneSyncEnrollmentEventHandler",
-                    "OneSyncNotifierEventHandler",
-                    "OneSyncTokenOwnershipUpdateEventHandler"))
-            .build());
-    apps.add(
-        SimpleApp.builder()
-            .blockchain(ChainType.ethereum)
-            .appName("Phantaci")
-            .handlers(List.of("PhantaBearEventHandler", "PhantaDogEventHandler"))
-            .build());
-    apps.add(
-        SimpleApp.builder()
-            .blockchain(ChainType.ethereum)
-            .appName("Theirsverse")
-            .handlers(List.of("TheirsverseTransferEventHandler"))
-            .build());
-    return QueryAppResponse.builder().apps(apps).build();
+    final Map<String, List<String>> map = new HashMap<>();
+    final BlockchainEventHandlers eventHandlers =
+        blockchainEventHandlerServiceBlockingStub.getHandlers(Empty.getDefaultInstance());
+    eventHandlers.getHandlersList().stream()
+        .filter(blockchainEventHandler -> !"Default".equals(blockchainEventHandler.getGroup()))
+        .forEach(
+            blockchainEventHandler -> {
+              if (map.get(blockchainEventHandler.getGroup()) == null) {
+                map.put(
+                    blockchainEventHandler.getGroup(),
+                    new ArrayList<>(List.of(blockchainEventHandler.getName())));
+              } else {
+                map.get(blockchainEventHandler.getGroup()).add(blockchainEventHandler.getName());
+              }
+            });
+    return QueryAppResponse.builder()
+        .apps(
+            map.entrySet().stream()
+                .map(
+                    entry ->
+                        SimpleApp.builder()
+                            .blockchain(ChainType.ethereum)
+                            .appName(entry.getKey())
+                            .handlers(entry.getValue())
+                            .build())
+                .collect(Collectors.toList()))
+        .build();
   }
 
   @Override
@@ -241,8 +224,8 @@ public class BlockchainServiceImpl implements BlockchainService {
                           .blockNumber(blockTransaction.getBlockNumber())
                           .transactionHash(blockTransaction.getTransactionHash())
                           .timestamp(blockJson.get("block_timestamp").getAsString())
-                          .from(blockJson.get("from_address").getAsString())
-                          .to(blockJson.get("to_address").getAsString())
+                          .from(blockTransaction.getFrom())
+                          .to(blockTransaction.getTo())
                           .value(blockJson.get("value").getAsString())
                           .build();
                     })

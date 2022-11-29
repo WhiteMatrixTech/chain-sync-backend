@@ -28,6 +28,7 @@ dependencies {
     implementation 'com.matrix:matrix-common-model'
     implementation 'com.matrix:matrix-cloud-dao'
     implementation 'com.matrix:matrix-cloud-common-model-grpc'
+    implementation 'com.matrix:matrix-cloud-blockchain-event-handler-grpc'
 
     // common dependency
     implementation 'net.devh:grpc-client-spring-boot-starter:2.13.1.RELEASE'
