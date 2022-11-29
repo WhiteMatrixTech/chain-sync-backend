@@ -224,8 +224,8 @@ public class BlockchainServiceImpl implements BlockchainService {
                           .blockNumber(blockTransaction.getBlockNumber())
                           .transactionHash(blockTransaction.getTransactionHash())
                           .timestamp(blockJson.get("block_timestamp").getAsString())
-                          .from(blockJson.get("from_address").getAsString())
-                          .to(blockJson.get("to_address").getAsString())
+                          .from(blockTransaction.getFrom())
+                          .to(blockTransaction.getTo())
                           .value(blockJson.get("value").getAsString())
                           .build();
                     })
