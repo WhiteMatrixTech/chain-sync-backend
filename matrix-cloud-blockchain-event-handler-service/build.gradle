@@ -24,13 +24,14 @@ dependencies {
     // inner dependency
     implementation 'com.matrix:matrix-cloud-blockchain-event-handler-model'
     implementation 'com.matrix:matrix-cloud-blockchain-event-handler-sdk'
+    implementation 'com.matrix:matrix-cloud-blockchain-event-handler-grpc'
     implementation 'com.matrix:matrix-cloud-theirsverse-service-grpc'
     implementation 'com.matrix:matrix-cloud-dao'
     implementation 'com.matrix:matrix-dynamodb-sdk'
     implementation 'com.matrix:matrix-common-model'
 
     // common dependency
-    implementation 'net.devh:grpc-client-spring-boot-starter:2.13.1.RELEASE'
+    implementation 'net.devh:grpc-spring-boot-starter:2.13.1.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.retry:spring-retry'

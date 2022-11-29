@@ -24,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PhantaBearEventHandler implements BlockchainEventHandler {
 
+  public static final String GROUP = "Phantaci";
+
   private static final HttpHeaders REQUEST_HEADERS = new HttpHeaders();
 
   static {
@@ -40,6 +42,11 @@ public class PhantaBearEventHandler implements BlockchainEventHandler {
 
   @Value("${phantaBear.metadata.endpoint:http://matrix-metadata-service:8080/metadata/api/v1/nft}")
   String metadataUrl;
+
+  @Override
+  public String getGroup() {
+    return GROUP;
+  }
 
   @Override
   public boolean isApplicable(final BlockChainEvent blockChainEvent) {

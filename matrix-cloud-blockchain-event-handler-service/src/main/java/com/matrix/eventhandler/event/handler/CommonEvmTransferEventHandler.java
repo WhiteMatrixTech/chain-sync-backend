@@ -43,16 +43,14 @@ import org.web3j.protocol.http.HttpService;
 @Profile({"alpha-mainnet", "local"})
 public class CommonEvmTransferEventHandler implements BlockchainEventHandler, InitializingBean {
 
+  public static final String GROUP = "Default";
   public static final String TRANSFER = "Transfer";
 
-  @Resource
-  TokenDao tokenDao;
+  @Resource TokenDao tokenDao;
 
-  @Resource
-  RestTemplate restTemplate;
+  @Resource RestTemplate restTemplate;
 
-  @Resource
-  RetryTemplate retryTemplate;
+  @Resource RetryTemplate retryTemplate;
 
   @Resource(name = ThreadPoolExecutorModule.CACHED_EXECUTOR)
   ThreadPoolExecutor executor;
@@ -61,6 +59,11 @@ public class CommonEvmTransferEventHandler implements BlockchainEventHandler, In
   String web3jEndPoint;
 
   private Web3j web3j;
+
+  @Override
+  public String getGroup() {
+    return GROUP;
+  }
 
   @Override
   public boolean isApplicable(final BlockChainEvent blockChainEvent) {
@@ -74,7 +77,7 @@ public class CommonEvmTransferEventHandler implements BlockchainEventHandler, In
   public void processBlockChainEvent(final BlockChainEvent blockChainEvent) {
     final EvmEvent event = (EvmEvent) blockChainEvent;
     final String tokenId = event.getPayload().get("tokenId").getValue().toString();
-    Address contract = blockChainEvent.getContract();
+    final Address contract = blockChainEvent.getContract();
     final Address from =
         Address.fromAddressAndChainId(
             event.getPayload().get("from").toString(), event.getContract().getChainId());
@@ -87,70 +90,104 @@ public class CommonEvmTransferEventHandler implements BlockchainEventHandler, In
         tokenId,
         from,
         to);
-    Token item = tokenDao.getItem(contract.getCanonicalAddress(), tokenId);
+    final Token item = tokenDao.getItem(contract.getCanonicalAddress(), tokenId);
     if (item == null) {
       log.info(
           "[CommonEvmTransferEventHandler] no token find, save and update metadata, contract: [{}] tokenId: [{}]",
-          contract, tokenId);
-      tokenDao.putItem(Token.builder().address(contract.getCanonicalAddress()).tokenId(tokenId)
-          .owner(to.getCanonicalAddress()).build());
+          contract,
+          tokenId);
+      tokenDao.putItem(
+          Token.builder()
+              .address(contract.getCanonicalAddress())
+              .tokenId(tokenId)
+              .owner(to.getCanonicalAddress())
+              .build());
       executor.submit(() -> updateMetadata(contract, tokenId));
       return;
     }
     log.info(
         "[CommonEvmTransferEventHandler] token is existed, only update owner, contract: [{}] tokenId: [{}]",
-        contract, tokenId);
-    tokenDao.update(contract.getCanonicalAddress(), tokenId,
+        contract,
+        tokenId);
+    tokenDao.update(
+        contract.getCanonicalAddress(),
+        tokenId,
         List.of(new AttributeUpdate(Token.ATTR_OWNER).put(to.getCanonicalAddress())));
   }
 
   @SneakyThrows
-  public void updateMetadata(Address address, String tokenId) {
-    log.info("[CommonEvmTransferEventHandler] start to update metadata, address: {}, tokenId: {}",
-        address, tokenId);
-    String tokenURI = retryTemplate.execute(context -> {
-      Function function = new Function(
-          "tokenURI",
-          List.of(new Uint256(new BigInteger(tokenId))),
-          List.of(new TypeReference<Utf8String>() {
-          }));
+  public void updateMetadata(final Address address, final String tokenId) {
+    log.info(
+        "[CommonEvmTransferEventHandler] start to update metadata, address: {}, tokenId: {}",
+        address,
+        tokenId);
+    final String tokenURI =
+        retryTemplate.execute(
+            context -> {
+              final Function function =
+                  new Function(
+                      "tokenURI",
+                      List.of(new Uint256(new BigInteger(tokenId))),
+                      List.of(new TypeReference<Utf8String>() {}));
 
-      String encodedFunction = FunctionEncoder.encode(function);
-      EthCall response = web3j.ethCall(
-              Transaction.createEthCallTransaction("0x0000000000000000000000000000000000000000",
-                  address.getNormalizedAddress(),
-                  encodedFunction),
-              DefaultBlockParameterName.LATEST)
-          .sendAsync().get();
+              final String encodedFunction = FunctionEncoder.encode(function);
+              final EthCall response =
+                  web3j
+                      .ethCall(
+                          Transaction.createEthCallTransaction(
+                              "0x0000000000000000000000000000000000000000",
+                              address.getNormalizedAddress(),
+                              encodedFunction),
+                          DefaultBlockParameterName.LATEST)
+                      .sendAsync()
+                      .get();
 
-      List<Type> someTypes = FunctionReturnDecoder.decode(
-          response.getValue(), function.getOutputParameters());
-      return (String) someTypes.get(0).getValue();
-    }, context -> {
-      log.error("retry 3 times failed when get tokenURI, address: {}, token: {}", address, tokenId,
-          context.getLastThrowable());
-      throw new ErrorCodedException(ResultCode.INTERNAL_SERVER_ERROR,
-          "retry 3 times failed when get tokenURI, address: " + address + "token: " + tokenId,
-          context.getLastThrowable());
-    });
+              final List<Type> someTypes =
+                  FunctionReturnDecoder.decode(response.getValue(), function.getOutputParameters());
+              return (String) someTypes.get(0).getValue();
+            },
+            context -> {
+              log.error(
+                  "retry 3 times failed when get tokenURI, address: {}, token: {}",
+                  address,
+                  tokenId,
+                  context.getLastThrowable());
+              throw new ErrorCodedException(
+                  ResultCode.INTERNAL_SERVER_ERROR,
+                  "retry 3 times failed when get tokenURI, address: "
+                      + address
+                      + "token: "
+                      + tokenId,
+                  context.getLastThrowable());
+            });
     log.info(
         "[CommonEvmTransferEventHandler] metadata uri resolve success, address:{}, token:{}, uri: {}",
-        address, tokenId, tokenURI);
-    tokenDao.update(address.getCanonicalAddress(), tokenId,
+        address,
+        tokenId,
+        tokenURI);
+    tokenDao.update(
+        address.getCanonicalAddress(),
+        tokenId,
         List.of(new AttributeUpdate(Token.ATTR_TOKEN_METADATA_URI).put(tokenURI)));
 
-    //todo not handle ethereum ipfs now
+    // todo not handle ethereum ipfs now
     if (UrlValidator.getInstance().isValid(tokenURI)) {
-      String tokenMetadataRaw = retryTemplate.execute(
-          context -> restTemplate.getForObject(tokenURI, String.class), context -> {
-            log.error("retry 3 times failed when get metadata from tokenURI, tokenURI: {}",
-                tokenURI,
-                context.getLastThrowable());
-            throw new ErrorCodedException(ResultCode.INTERNAL_SERVER_ERROR,
-                "retry 3 times failed when get metadata from tokenURI, tokenURI: " + tokenURI,
-                context.getLastThrowable());
-          });
-      tokenDao.update(address.getCanonicalAddress(), tokenId,
+      final String tokenMetadataRaw =
+          retryTemplate.execute(
+              context -> restTemplate.getForObject(tokenURI, String.class),
+              context -> {
+                log.error(
+                    "retry 3 times failed when get metadata from tokenURI, tokenURI: {}",
+                    tokenURI,
+                    context.getLastThrowable());
+                throw new ErrorCodedException(
+                    ResultCode.INTERNAL_SERVER_ERROR,
+                    "retry 3 times failed when get metadata from tokenURI, tokenURI: " + tokenURI,
+                    context.getLastThrowable());
+              });
+      tokenDao.update(
+          address.getCanonicalAddress(),
+          tokenId,
           List.of(new AttributeUpdate(Token.ATTR_TOKEN_METADATA_RAW).put(tokenMetadataRaw)));
     }
   }

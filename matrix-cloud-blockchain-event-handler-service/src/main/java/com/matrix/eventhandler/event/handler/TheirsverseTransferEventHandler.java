@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 @Profile({"alpha-testnet", "prod-mainnet", "beta-testnet", "local"})
 public class TheirsverseTransferEventHandler implements BlockchainEventHandler {
 
+  public static final String GROUP = "Theirsverse";
   @Resource NftCollectionDao nftCollectionDao;
 
   @GrpcClient("matrix-cloud-theirsverse-service")
@@ -41,6 +42,11 @@ public class TheirsverseTransferEventHandler implements BlockchainEventHandler {
       return nftCollection != null;
     }
     return false;
+  }
+
+  @Override
+  public String getGroup() {
+    return GROUP;
   }
 
   @Override

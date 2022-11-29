@@ -27,6 +27,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OneSyncEnrollmentEventHandler implements BlockchainEventHandler {
 
+  public static final String GROUP = "OneSync";
+
   private static final HttpHeaders REQUEST_HEADERS = new HttpHeaders();
 
   static {
@@ -42,6 +44,11 @@ public class OneSyncEnrollmentEventHandler implements BlockchainEventHandler {
 
   @Value("${oneSync.metadata.endpoint:http://matrix-cloud-metadata-service:8080/metadata/api}")
   String metadataUrl;
+
+  @Override
+  public String getGroup() {
+    return GROUP;
+  }
 
   @Override
   public boolean isApplicable(final BlockChainEvent blockChainEvent) {

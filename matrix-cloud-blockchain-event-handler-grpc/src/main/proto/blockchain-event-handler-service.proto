@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package com.matrix.eventhandler.model;
+
+option java_multiple_files = true;
+option java_package = "com.matrix.eventhandler.model";
+option java_outer_classname = "BlockchainEventHandlerServiceProto";
+
+service BlockchainEventHandlerService {
+  rpc getHandlers(google.protobuf.Empty) returns (BlockchainEventHandlers);
+}
+
+message BlockchainEventHandlers {
+  repeated BlockchainEventHandler handlers = 1;
+}
+
+message BlockchainEventHandler {
+  string name = 1;
+  string group = 2;
+}
