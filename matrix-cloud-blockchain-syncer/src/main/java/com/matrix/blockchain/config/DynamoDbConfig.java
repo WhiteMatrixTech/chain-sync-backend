@@ -21,5 +21,5 @@ public class DynamoDbConfig {
   private String blockSuccessTableName;
   private String blockFailedTableName;
   private String blockInfoTableName;
-  private String blockTransactionTableName;
+  private String ethTransactionTableName;
 }

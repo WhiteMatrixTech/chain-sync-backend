@@ -1,0 +1,21 @@
+app: matrix-cloud
+service: matrix-cloud-etl-service
+ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+hpa: false
+serviceAccountName: aws-access
+deploy:
+  image: 316274061697.dkr.ecr.ap-northeast-1.amazonaws.com
+  stage:
+    alpha:
+      cluster: matrix-alpha
+      namespace: alpha
+      autoSync: true
+    beta:
+      cluster: matrix-beta
+      namespace: beta
+    prod:
+      cluster: matrix-prod
+      namespace: prod

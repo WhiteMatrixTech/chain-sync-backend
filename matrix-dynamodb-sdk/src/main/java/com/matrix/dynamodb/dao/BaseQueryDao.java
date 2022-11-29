@@ -514,6 +514,10 @@ public abstract class BaseQueryDao<OrmType> {
             null,
             null));
   }
+  
+  protected List<OrmType> scan(final ScanSpec scanSpec) {
+    return scanOutcomeToItems(dynamoDB.getTable(tableDefinition.getTableName()).scan(scanSpec));
+  }
 
   public List<OrmType> scanWithFilter(final ScanFilter... scanFilters) {
     final ScanApi scanApi = dynamoDB.getTable(tableDefinition.getTableName());

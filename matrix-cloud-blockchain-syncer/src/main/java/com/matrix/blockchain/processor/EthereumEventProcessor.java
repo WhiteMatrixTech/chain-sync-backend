@@ -1,8 +1,8 @@
 package com.matrix.blockchain.processor;
 
 import com.matrix.blockchain.constants.Constants;
+import com.matrix.blockchain.dao.ETHTransactionDao;
 import com.matrix.blockchain.dao.EthereumBlockInfoDao;
-import com.matrix.blockchain.dao.EthereumBlockTransactionDao;
 import com.matrix.blockchain.model.BlockEvent;
 import com.matrix.blockchain.model.BlockRange;
 import com.matrix.blockchain.model.BlockTip;
@@ -44,16 +44,16 @@ public class EthereumEventProcessor extends CommonEventProcessor {
 
   @Resource private EthereumBlockInfoDao ethereumBlockInfoDao;
 
-  @Resource private EthereumBlockTransactionDao ethereumBlockTransactionDao;
+  @Resource private ETHTransactionDao ethTransactionDao;
 
   @Override
   public List<BlockEvent> process(BlockRange blockRange) {
     try {
-      Web3jContainer web3jContainer =
+      final Web3jContainer web3jContainer =
           web3jMap.get(BlockchainType.getWeb3j(blockRange.getChainId()));
-      BaseQueryDao ethBlockEventDao =
+      final BaseQueryDao ethBlockEventDao =
           ethBlockEventDaoMap.get(BlockchainType.getBlockEventDao(blockRange.getChainId()));
-      long blockHeight = eventRetriever.getBlockHeight(web3jContainer);
+      final long blockHeight = eventRetriever.getBlockHeight(web3jContainer);
       if (blockRange.getFrom() > blockHeight - blockRange.getBlockBuff()) {
         return Collections.emptyList();
       }
@@ -62,17 +62,17 @@ public class EthereumEventProcessor extends CommonEventProcessor {
       }
 
       // step 0. query block tip
-      BlockTip tip = blockTipDao.getItem(blockRange.getChainId());
+      final BlockTip tip = blockTipDao.getItem(blockRange.getChainId());
       if (!blockRange.getForceFromChain() && tip.getBlockNumber() >= blockRange.getTo()) {
         return super.queryEvents(ethBlockEventDao, blockRange);
       }
 
       // step 1. get event logs from chain
-      List<LogObject> logs = eventRetriever.retrieveEvents(web3jContainer, blockRange);
-      Map<Long, Block> blockMap = eventRetriever.retrieveBlocks(web3jContainer, blockRange);
+      final List<LogObject> logs = eventRetriever.retrieveEvents(web3jContainer, blockRange);
+      final Map<Long, Block> blockMap = eventRetriever.retrieveBlocks(web3jContainer, blockRange);
 
       // step 2. persistent events into ddb
-      List<BlockEvent> events =
+      final List<BlockEvent> events =
           filterAndConvertEvents(
               blockMap, logs, super.getEventMap(ethBlockEventDao, blockRange), blockRange);
       super.persistentEvents(ethBlockEventDao, blockRange, events);
@@ -81,7 +81,7 @@ public class EthereumEventProcessor extends CommonEventProcessor {
       super.persistentBlocks(ethereumBlockInfoDao, blockRange, blockMap);
 
       // persistent transaction info into ddb
-      super.persistentTransactions(ethereumBlockTransactionDao, blockRange, blockMap);
+      super.persistentTransactions(ethTransactionDao, blockRange, blockMap);
 
       // step 3. notify through mq
       super.notifyEvents(blockRange, events);
@@ -92,7 +92,7 @@ public class EthereumEventProcessor extends CommonEventProcessor {
       // step 5. update tip
       blockTipDao.updateTip(blockRange);
       return events;
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error(
           "eth sync chainType: {}, from: {}, to: {}, error: {}",
           blockRange.getChainType(),
@@ -111,19 +111,19 @@ public class EthereumEventProcessor extends CommonEventProcessor {
   }
 
   @Override
-  public boolean isApplicable(String chainType) {
+  public boolean isApplicable(final String chainType) {
     return ChainType.ethereum.name().equalsIgnoreCase(chainType)
         || ChainType.polygon.name().equalsIgnoreCase(chainType);
   }
 
   private List<BlockEvent> filterAndConvertEvents(
-      Map<Long, Block> blockMap,
-      List<LogObject> events,
-      Map<String, BlockEvent> eventMap,
-      BlockRange blockRange) {
-    List<BlockEvent> blockEvents = new ArrayList<>();
-    for (LogObject event : events) {
-      EthereumBlockEvent blockEvent = EthereumBlockEvent.convertFromEventLog(event);
+      final Map<Long, Block> blockMap,
+      final List<LogObject> events,
+      final Map<String, BlockEvent> eventMap,
+      final BlockRange blockRange) {
+    final List<BlockEvent> blockEvents = new ArrayList<>();
+    for (final LogObject event : events) {
+      final EthereumBlockEvent blockEvent = EthereumBlockEvent.convertFromEventLog(event);
       blockEvent.setEventKey(
           blockEvent.resolveEventKey(blockEvent.getBlockNumber(), blockEvent.getLogIndex()));
       if (isExceeded(event.getData())) {
@@ -137,7 +137,7 @@ public class EthereumEventProcessor extends CommonEventProcessor {
                     blockEvent.getTransactionHash(),
                     blockEvent.getLogIndex())));
       }
-      String key = blockEvent.getKey();
+      final String key = blockEvent.getKey();
       if (eventMap.get(key) == null
           || NotifyStatus.NOT_SENT
               .name()
@@ -152,10 +152,10 @@ public class EthereumEventProcessor extends CommonEventProcessor {
     return blockEvents;
   }
 
-  private void updateEventStatus(BaseQueryDao blockEventDao, List<BlockEvent> events) {
-    Instant now = Instant.now();
-    for (BlockEvent event : events) {
-      EthereumBlockEvent ethereumBlockEvent = ((EthereumBlockEvent) event);
+  private void updateEventStatus(final BaseQueryDao blockEventDao, final List<BlockEvent> events) {
+    final Instant now = Instant.now();
+    for (final BlockEvent event : events) {
+      final EthereumBlockEvent ethereumBlockEvent = ((EthereumBlockEvent) event);
       ethereumBlockEvent.setStatus(NotifyStatus.SENT.name());
       ethereumBlockEvent.setUpdatedAt(now);
     }
