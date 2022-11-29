@@ -6,3 +6,6 @@ grpc:
     matrix-cloud-marketplace-metadata-service:
       address: 'static://localhost:9094'
       negotiationType: 'PLAINTEXT'
+    matrix-cloud-blockchain-event-handler-service:
+      address: 'static://localhost:9095'
+      negotiationType: 'PLAINTEXT'
