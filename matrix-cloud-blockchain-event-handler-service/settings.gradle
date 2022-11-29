@@ -1,5 +1,6 @@
 rootProject.name = 'matrix-cloud-blockchain-event-handler-service'
 includeBuild '../matrix-cloud-blockchain-event-handler-model'
+includeBuild '../matrix-cloud-blockchain-event-handler-grpc'
 includeBuild '../matrix-cloud-blockchain-event-handler-sdk'
 includeBuild '../matrix-cloud-theirsverse-service-grpc'
 includeBuild '../matrix-cloud-dao'

@@ -9,6 +9,8 @@ import com.matrix.eventhandler.model.BlockChainEvent;
  */
 public interface BlockchainEventHandler {
 
+  String getGroup();
+
   /** should the handler impl handle this event */
   boolean isApplicable(BlockChainEvent blockChainEvent);
 
