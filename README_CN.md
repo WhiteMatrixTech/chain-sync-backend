@@ -54,7 +54,9 @@ DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin
 
 连接配置
 
-![](kafka-viewer-config.png)
+![](kafka-viewer-config1.png)
+
+![](kafka-viewer-config2.png)
 
 启动SyncerApplication后可以看到如下topic的信息
 
