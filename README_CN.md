@@ -1,23 +1,24 @@
-# matrix-cloud-ETL
+# matrix-cloud-ETL-backend
 
-java环境为jdk11
+## Prerequisites
 
-gradle版本使用每个文件夹内的gradle/gradle-wrapper.properties
+- JDK 11
+- Docker
+- Gradle版本使用每个文件夹内的gradle/gradle-wrapper.properties
 
-## run locally
+## Frontend repository
 
-通过docker和docker-compose安装必要本地环境
+https://github.com/WhiteMatrixTech/matrix-cloud-ETL-front-public
 
-docker-compose仓库：https://github.com/WhiteMatrixTech/dev-in-docker
+## Run locally
 
-### 安装dynamodb-local
+1. 启动依赖的组件
 
 ```
-cd dynamodb
 docker-compose up -d
 ```
 
-(optional) 验证dynamodb-local是否安装成功
+- (optional) 验证dynamodb-local是否安装成功
 
 ```
 npm install -g dynamodb-admin
@@ -32,64 +33,41 @@ DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin
 
 安装成功后浏览器打开http://localhost:8001
 
-
 如果启动SyncerApplication后可以看到如下表的信息
 
 ![](dynamodb-admin.png)
 
 打开表matrix-cloud-blockchain-tip-local，添加如下对象
 
+```
 {
-"chainId": "mainnet_ethereum",
-"blockNumber": 15988116
+    "chainId": "mainnet_ethereum",
+    "blockNumber": 15988116 
 }
+```
 
 ![](matrix-cloud-blockchain-tip-local.png)
 
-### 安装kafka-local
-
-```
-cd kafka
-
-//按readme中修改参数
-
-docker-compose up -d
-```
-
-(optional) 验证kafka-local是否安装成功
+- (optional) 验证kafka-local是否安装成功
 
 根据平台下载并安装kafkatool：https://www.kafkatool.com/download.html
 
 连接配置
 
-![](kafka-viewer-config.png)
+![](kafka-viewer-config1.png)
+
+![](kafka-viewer-config2.png)
 
 启动SyncerApplication后可以看到如下topic的信息
 
 ![](kafka-viewer.png)
 
-### 安装s3-local
-
-```
-cd s3
-docker-compose up -d
-```
-
-(optional) 验证s3-local是否安装成功
-
-### 安装redis-local
-
-```
-cd redis
-docker-compose up -d
-```
-
-### 申请 ethereum network endpoint
+2. 申请 ethereum network endpoint
 
 可以去https://www.alchemy.com/ 或者 https://www.infura.io/ 创建app并获取endpoint然后填入
 matrix-cloud-blockchain-syncer 中application-local下的blockchain:ethereum-provider-endpoint
 
-## 启动Syncer服务
+3. 启动Syncer服务
 
 如果本地环境中没有aws相关配置，在环境变量中设置AWS_ACCESS_KEY_ID=123;AWS_SECRET_KEY=123以跳过aws检查
 
