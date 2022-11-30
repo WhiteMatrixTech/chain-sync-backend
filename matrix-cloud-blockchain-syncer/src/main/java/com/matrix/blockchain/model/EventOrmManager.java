@@ -7,7 +7,7 @@ public class EventOrmManager {
 
   public static final String ETHEREUM_EVENT_ORM_MANAGER = "ethereumEventOrmManager";
 
-  public static final String MUMBAI_EVENT_ORM_MANAGER = "mumbaiEventOrmManager";
+  public static final String BSC_EVENT_ORM_MANAGER = "bscEventOrmManager";
 
   public static final String POLYGON_EVENT_ORM_MANAGER = "polygonEventOrmManager";
 

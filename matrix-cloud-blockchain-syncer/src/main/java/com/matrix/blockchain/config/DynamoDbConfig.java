@@ -11,15 +11,16 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "dynamodb")
 public class DynamoDbConfig {
-  private String rinkebyEventTableName;
-  private String mumbaiEventTableName;
+  private String bscEventTableName;
   private String ethereumEventTableName;
   private String polygonEventTableName;
+  private String bscTransactionTableName;
+  private String ethTransactionTableName;
+  private String polygonTransactionTableName;
   private String blockchainTipTableName;
   private String syncErrorTableName;
   private String blockchainOffsetTableName;
   private String blockSuccessTableName;
   private String blockFailedTableName;
   private String blockInfoTableName;
-  private String ethTransactionTableName;
 }

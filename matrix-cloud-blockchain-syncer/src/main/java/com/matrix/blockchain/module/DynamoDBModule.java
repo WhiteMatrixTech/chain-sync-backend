@@ -2,7 +2,9 @@ package com.matrix.blockchain.module;
 
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.matrix.blockchain.config.DynamoDbConfig;
-import com.matrix.blockchain.dao.ETHTransactionDao;
+import com.matrix.blockchain.dao.BscTransactionDao;
+import com.matrix.blockchain.dao.EthereumTransactionDao;
+import com.matrix.blockchain.dao.PolygonTransactionDao;
 import com.matrix.blockchain.model.BlockFailed;
 import com.matrix.blockchain.model.BlockOffset;
 import com.matrix.blockchain.model.BlockSuccess;
@@ -31,10 +33,10 @@ public class DynamoDBModule {
         this.dynamoDBConfig.getEthereumEventTableName(), EthereumBlockEvent.class);
   }
 
-  @Bean(EventOrmManager.MUMBAI_EVENT_ORM_MANAGER)
+  @Bean(EventOrmManager.BSC_EVENT_ORM_MANAGER)
   public DynamoDBTableOrmManager<EthereumBlockEvent> getMumbaiEventOrmManager() {
     return new AnnotatedDynamoDBTableOrmManager<>(
-        this.dynamoDBConfig.getMumbaiEventTableName(), EthereumBlockEvent.class);
+        this.dynamoDBConfig.getBscEventTableName(), EthereumBlockEvent.class);
   }
 
   @Bean(EventOrmManager.POLYGON_EVENT_ORM_MANAGER)
@@ -79,8 +81,18 @@ public class DynamoDBModule {
         this.dynamoDBConfig.getBlockInfoTableName(), EthereumBlockInfo.class);
   }
 
-  @Bean
-  public ETHTransactionDao ethTransactionDao(final DynamoDB dynamoDB) {
-    return new ETHTransactionDao(dynamoDBConfig.getEthTransactionTableName(), dynamoDB);
+  @Bean("ethereumTransactionDao")
+  public EthereumTransactionDao ethTransactionDao(final DynamoDB dynamoDB) {
+    return new EthereumTransactionDao(dynamoDBConfig.getEthTransactionTableName(), dynamoDB);
+  }
+
+  @Bean("bscTransactionDao")
+  public BscTransactionDao bscTransactionDao(final DynamoDB dynamoDB) {
+    return new BscTransactionDao(dynamoDBConfig.getBscTransactionTableName(), dynamoDB);
+  }
+
+  @Bean("polygonTransactionDao")
+  public PolygonTransactionDao polygonTransactionDao(final DynamoDB dynamoDB) {
+    return new PolygonTransactionDao(dynamoDBConfig.getPolygonTransactionTableName(), dynamoDB);
   }
 }

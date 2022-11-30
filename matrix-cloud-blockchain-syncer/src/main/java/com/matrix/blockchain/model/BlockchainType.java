@@ -7,35 +7,27 @@ import lombok.Getter;
  */
 @Getter
 public enum BlockchainType {
-  RINKEBY(
-      "rinkeby_ethereum",
-      "rinkebyWeb3j",
-      "rinkebyBlockEventDao",
-      null,
-      "rinkebyBlockchainLogKafkaClient",
-      null),
-
   ETHEREUM(
       "mainnet_ethereum",
       "ethereumWeb3j",
       "ethereumBlockEventDao",
-      null,
+      "ethereumTransactionDao",
       "ethereumBlockchainLogKafkaClient",
       null),
 
-  MUMBAI(
-      "mumbai_polygon",
-      "mumbaiWeb3j",
-      "mumbaiBlockEventDao",
-      null,
-      "mumbaiBlockchainLogKafkaClient",
+  BSC(
+      "mainnet_bsc",
+      "bscWeb3j",
+      "bscBlockEventDao",
+      "bscTransactionDao",
+      "bscBlockchainLogKafkaClient",
       null),
 
   POLYGON(
       "mainnet_polygon",
       "polygonWeb3j",
       "polygonBlockEventDao",
-      null,
+      "polygonTransactionDao",
       "polygonBlockchainLogKafkaClient",
       null),
 
@@ -55,17 +47,17 @@ public enum BlockchainType {
       "flowMainNetBlockchainLogKafkaClient",
       "flowMainNetTransactionKafkaClient",
       "flowMainNetTransactionHistoryKafkaClient");
-  private String chainId;
+  private final String chainId;
 
-  private String web3jName;
+  private final String web3jName;
 
-  private String blockEventDaoName;
+  private final String blockEventDaoName;
 
-  private String transactionDaoName;
+  private final String transactionDaoName;
 
-  private String blockchainLogKafkaClientName;
+  private final String blockchainLogKafkaClientName;
 
-  private String blockchainTransactionKafkaClientName;
+  private final String blockchainTransactionKafkaClientName;
 
   private String blockchainTransactionHistoryKafkaClientName;
 
@@ -101,8 +93,8 @@ public enum BlockchainType {
     this.blockchainTransactionHistoryKafkaClientName = blockchainTransactionHistoryKafkaClientName;
   }
 
-  public static String getWeb3j(String chainId) {
-    for (BlockchainType e : values()) {
+  public static String getWeb3j(final String chainId) {
+    for (final BlockchainType e : values()) {
       if (chainId.equals(e.chainId)) {
         return e.web3jName;
       }
@@ -111,8 +103,8 @@ public enum BlockchainType {
         String.format("Current web3j is not supported, chainId is [%s]", chainId));
   }
 
-  public static String getBlockEventDao(String chainId) {
-    for (BlockchainType e : values()) {
+  public static String getBlockEventDao(final String chainId) {
+    for (final BlockchainType e : values()) {
       if (chainId.equals(e.chainId)) {
         return e.blockEventDaoName;
       }
@@ -121,8 +113,8 @@ public enum BlockchainType {
         String.format("Current blockEventDao is not supported, chainId is [%s]", chainId));
   }
 
-  public static String getBlockchainTransactionDao(String chainId) {
-    for (BlockchainType e : values()) {
+  public static String getBlockchainTransactionDao(final String chainId) {
+    for (final BlockchainType e : values()) {
       if (chainId.equals(e.chainId)) {
         return e.transactionDaoName;
       }
@@ -131,8 +123,8 @@ public enum BlockchainType {
         String.format("Current transactionDao is not supported, chainId is [%s]", chainId));
   }
 
-  public static String getBlockchainLogKafkaClient(String chainId) {
-    for (BlockchainType e : values()) {
+  public static String getBlockchainLogKafkaClient(final String chainId) {
+    for (final BlockchainType e : values()) {
       if (chainId.equals(e.chainId)) {
         return e.blockchainLogKafkaClientName;
       }
@@ -142,8 +134,8 @@ public enum BlockchainType {
             "Current blockchainLogKafkaClient is not supported, chainId is [%s]", chainId));
   }
 
-  public static String getBlockchainTransactionKafkaClient(String chainId) {
-    for (BlockchainType e : values()) {
+  public static String getBlockchainTransactionKafkaClient(final String chainId) {
+    for (final BlockchainType e : values()) {
       if (chainId.equals(e.chainId)) {
         return e.blockchainTransactionKafkaClientName;
       }
@@ -153,8 +145,8 @@ public enum BlockchainType {
             "Current blockchainTransactionKafkaClient is not supported, chainId is [%s]", chainId));
   }
 
-  public static String getBlockchainTransactionHistoryKafkaClient(String chainId) {
-    for (BlockchainType e : values()) {
+  public static String getBlockchainTransactionHistoryKafkaClient(final String chainId) {
+    for (final BlockchainType e : values()) {
       if (chainId.equals(e.chainId)) {
         return e.blockchainTransactionHistoryKafkaClientName;
       }

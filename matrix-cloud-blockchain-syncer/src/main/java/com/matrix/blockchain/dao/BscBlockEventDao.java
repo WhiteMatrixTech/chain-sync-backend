@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
  */
 @Log4j2
 @Component
-public class MumbaiBlockEventDao extends BaseQueryDao<EthereumBlockEvent> {
+public class BscBlockEventDao extends BaseQueryDao<EthereumBlockEvent> {
 
-  public MumbaiBlockEventDao(
-      @Qualifier(EventOrmManager.MUMBAI_EVENT_ORM_MANAGER)
+  public BscBlockEventDao(
+      @Qualifier(EventOrmManager.BSC_EVENT_ORM_MANAGER)
           final DynamoDBTableOrmManager<EthereumBlockEvent> ormManager,
       final DynamoDB dynamoDB) {
     super(ormManager, dynamoDB);

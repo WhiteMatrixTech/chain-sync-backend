@@ -18,9 +18,10 @@ public class BlockchainConfig {
   /** ethereum */
   private List<String> ethereumProviderEndpoint;
 
-  /** mumbai */
-  private List<String> mumbaiProviderEndpoint;
 
   /** polygon */
   private List<String> polygonProviderEndpoint;
+
+  /** bsc */
+  private List<String> bscProviderEndpoint;
 }

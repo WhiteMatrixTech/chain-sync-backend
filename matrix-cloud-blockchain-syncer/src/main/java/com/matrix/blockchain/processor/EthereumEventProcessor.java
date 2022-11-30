@@ -1,11 +1,10 @@
 package com.matrix.blockchain.processor;
 
 import com.matrix.blockchain.constants.Constants;
-import com.matrix.blockchain.dao.ETHTransactionDao;
-import com.matrix.blockchain.dao.EthereumBlockInfoDao;
 import com.matrix.blockchain.model.BlockEvent;
 import com.matrix.blockchain.model.BlockRange;
 import com.matrix.blockchain.model.BlockTip;
+import com.matrix.blockchain.model.BlockTransaction;
 import com.matrix.blockchain.model.BlockchainType;
 import com.matrix.blockchain.model.EthereumBlockEvent;
 import com.matrix.blockchain.model.NotifyStatus;
@@ -42,9 +41,7 @@ public class EthereumEventProcessor extends CommonEventProcessor {
 
   @Resource private Map<String, BaseQueryDao<EthereumBlockEvent>> ethBlockEventDaoMap;
 
-  @Resource private EthereumBlockInfoDao ethereumBlockInfoDao;
-
-  @Resource private ETHTransactionDao ethTransactionDao;
+  @Resource private Map<String, BaseQueryDao<BlockTransaction>> ethBlockTransactionDaoMap;
 
   @Override
   public List<BlockEvent> process(BlockRange blockRange) {
@@ -53,6 +50,10 @@ public class EthereumEventProcessor extends CommonEventProcessor {
           web3jMap.get(BlockchainType.getWeb3j(blockRange.getChainId()));
       final BaseQueryDao ethBlockEventDao =
           ethBlockEventDaoMap.get(BlockchainType.getBlockEventDao(blockRange.getChainId()));
+      final BaseQueryDao ethBlockTransactionDao =
+          ethBlockTransactionDaoMap.get(
+              BlockchainType.getBlockchainTransactionDao(blockRange.getChainId()));
+
       final long blockHeight = eventRetriever.getBlockHeight(web3jContainer);
       if (blockRange.getFrom() > blockHeight - blockRange.getBlockBuff()) {
         return Collections.emptyList();
@@ -77,17 +78,17 @@ public class EthereumEventProcessor extends CommonEventProcessor {
               blockMap, logs, super.getEventMap(ethBlockEventDao, blockRange), blockRange);
       super.persistentEvents(ethBlockEventDao, blockRange, events);
 
-      // persistent blocks info into ddb
-      super.persistentBlocks(ethereumBlockInfoDao, blockRange, blockMap);
-
       // persistent transaction info into ddb
-      super.persistentTransactions(ethTransactionDao, blockRange, blockMap);
+      super.persistentTransactions(ethBlockTransactionDao, blockRange, blockMap);
 
-      // step 3. notify through mq
-      super.notifyEvents(blockRange, events);
+      // currently only notify ethereum event to downstream
+      if (blockRange.getChainType().equalsIgnoreCase(ChainType.ethereum.name())) {
+        // step 3. notify through mq
+        super.notifyEvents(blockRange, events);
 
-      // step 4. update event status to SEND
-      updateEventStatus(ethBlockEventDao, events);
+        // step 4. update event status to SEND
+        updateEventStatus(ethBlockEventDao, events);
+      }
 
       // step 5. update tip
       blockTipDao.updateTip(blockRange);
@@ -113,7 +114,8 @@ public class EthereumEventProcessor extends CommonEventProcessor {
   @Override
   public boolean isApplicable(final String chainType) {
     return ChainType.ethereum.name().equalsIgnoreCase(chainType)
-        || ChainType.polygon.name().equalsIgnoreCase(chainType);
+        || ChainType.polygon.name().equalsIgnoreCase(chainType)
+        || ChainType.bsc.name().equalsIgnoreCase(chainType);
   }
 
   private List<BlockEvent> filterAndConvertEvents(

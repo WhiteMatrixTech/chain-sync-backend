@@ -11,16 +11,19 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 dynamodb:
-  mumbai-event-table-name: matrix-cloud-mumbai-event-${STAGE:local}
+  bsc-event-table-name: matrix-cloud-bsc-event-${STAGE:local}
   ethereum-event-table-name: matrix-cloud-ethereum-event-${STAGE:local}
   polygon-event-table-name: matrix-cloud-polygon-event-${STAGE:local}
+  bsc-transaction-table-name: matrix-cloud-bsc-transaction-${STAGE:local}
+  eth-transaction-table-name: matrix-cloud-eth-transaction-${STAGE:local}
+  polygon-transaction-table-name: matrix-cloud-polygon-transaction-${STAGE:local}
   blockchain-tip-table-name: matrix-cloud-blockchain-tip-${STAGE:local}
   sync-error-table-name: matrix-cloud-blockchain-sync-error-${STAGE:local}
   blockchain-offset-table-name: matrix-cloud-blockchain-offset-${STAGE:local}
   block-success-table-name: matrix-cloud-block-success
   block-failed-table-name: matrix-cloud-block-failed-${STAGE:local}
   block-info-table-name: matrix-cloud-etl-ethereum-block-info-${STAGE:local}
-  eth-transaction-table-name: matrix-cloud-eth-transaction-${STAGE:local}
+
 cloud:
   aws:
     region:

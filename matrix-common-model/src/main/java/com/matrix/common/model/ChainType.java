@@ -11,6 +11,7 @@ public enum ChainType {
    */
   ethereum,
   polygon,
+  bsc,
   flow,
   aptos
 }

@@ -1,10 +1,10 @@
 package com.matrix.etl.module;
 
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.matrix.blockchain.dao.ETHTransactionDao;
 import com.matrix.dynamodb.orm.DynamoDBTableOrmManager;
 import com.matrix.dynamodb.orm.impl.AnnotatedDynamoDBTableOrmManager;
 import com.matrix.etl.config.DynamoDbConfig;
+import com.matrix.etl.dao.ETHTransactionDao;
 import com.matrix.etl.model.EthereumBlockEvent;
 import com.matrix.etl.model.Task;
 import com.matrix.etl.model.TaskDef;
