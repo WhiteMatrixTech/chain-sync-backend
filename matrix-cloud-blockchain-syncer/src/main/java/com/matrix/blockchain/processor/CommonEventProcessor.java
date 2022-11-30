@@ -183,30 +183,61 @@ public class CommonEventProcessor implements EventProcessor {
       final BlockRange blockRange,
       final Map<Long, EthBlock.Block> blockMap) {
     final long start = System.currentTimeMillis();
-    if (!CollectionUtils.isEmpty(blockMap)) {
-      final List<TransactionObject> transactionObjects =
-          blockMap.values().stream()
-              .map(EthBlock.Block::getTransactions)
-              .collect(Collectors.toList())
-              .stream()
-              .flatMap(List::stream)
-              .collect(Collectors.toList())
-              .stream()
-              .map(TransactionObject.class::cast)
-              .collect(Collectors.toList());
-      transactionObjects.parallelStream()
-          .forEach(
-              transactionObject ->
-                  queryDao.putItem(
-                      BlockTransaction.builder()
-                          .blockNumber(transactionObject.getBlockNumber().longValue())
-                          .transactionHash(transactionObject.getHash())
-                          .from(transactionObject.getFrom())
-                          .to(transactionObject.getTo())
-                          .rawData(gson.toJson(transactionObject))
-                          .build()));
+
+    if (CollectionUtils.isEmpty(blockMap)) {
+      return;
     }
 
+    final List<BlockTransaction> list = new ArrayList<>();
+    blockMap
+        .values()
+        .forEach(
+            block -> {
+              final Map<String, String> blockRaw =
+                  Map.of(
+                      "number",
+                      block.getNumber().toString(),
+                      "timestamp",
+                      block.getTimestamp().toString(),
+                      "transaction_count",
+                      String.valueOf(block.getTransactions().size()),
+                      "size",
+                      block.getSize().toString(),
+                      "gas_used",
+                      block.getGasUsed().toString());
+              final BlockTransaction transaction =
+                  BlockTransaction.builder()
+                      .blockNumber(block.getNumber().longValue())
+                      .transactionHash("0x")
+                      .rawData(gson.toJson(blockRaw))
+                      .build();
+              list.add(transaction);
+              block
+                  .getTransactions()
+                  .forEach(
+                      transactionResult -> {
+                        if (transactionResult instanceof TransactionObject) {
+                          final TransactionObject transactionObject =
+                              (TransactionObject) transactionResult;
+                          final Map<String, String> transactionRaw =
+                              Map.of(
+                                  "block_timestamp",
+                                  block.getTimestamp().toString(),
+                                  "value",
+                                  transactionObject.getValue().toString());
+                          final BlockTransaction build =
+                              BlockTransaction.builder()
+                                  .blockNumber(block.getNumber().longValue())
+                                  .transactionHash(transactionObject.getHash())
+                                  .from(transactionObject.getFrom())
+                                  .to(transactionObject.getTo())
+                                  .rawData(gson.toJson(transactionRaw))
+                                  .build();
+                          list.add(build);
+                        }
+                      });
+            });
+    queryDao.batchPutItem(list);
     log.info(
         "success persistent transactions, chainId: {}, range from: {} to: {}, final size: {}, cost: {} mills",
         blockRange.getChainId(),
