@@ -65,7 +65,15 @@ matrix-cloud-blockchain-syncer 中application-local下的blockchain:ethereum-pro
 ``` json
 {
     "chainId": "mainnet_ethereum",
-    "blockNumber": 15988116 
+    "blockNumber": 15988116
+}
+{
+    "chainId": "mainnet_bsc",
+    "blockNumber": 23525262
+}
+{
+    "chainId": "mainnet_polygon",
+    "blockNumber": 36285528
 }
 ```
 
@@ -77,7 +85,7 @@ matrix-cloud-blockchain-syncer 中application-local下的blockchain:ethereum-pro
 
 ## Retrieve data
 
-1. 使用 RPC 客户端（例如：[BloomRPC](https://github.com/bloomrpc/bloomrpc) 对 `0.0.0.0:9090` 发起请求。
+1. 使用 RPC 客户端（例如：[BloomRPC](https://github.com/bloomrpc/bloomrpc) 调用 `0.0.0.0:9090` runSyncTask。
 
 Request:
 ``` json
@@ -115,4 +123,4 @@ Response:
 
 2. (optional) 启动下游服务 `matrix-cloud-blockchain-event-handler-service`
 
-启动下游服务 `matrix-cloud-blockchain-event-handler-service` 后重复步骤1，打开`matrix-cloud-ethereum-event-local`表可以看到经过下游处理过后的的每个 transaction 里的具体事件。
+启动下游服务 `matrix-cloud-blockchain-event-handler-service` 后重复步骤1，此时打开 matrix-cloud-token-local 表可以看到下游handler解析出的token数据。
