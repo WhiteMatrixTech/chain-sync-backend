@@ -37,15 +37,6 @@ DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin
 
 ![](dynamodb-admin.png)
 
-打开表matrix-cloud-blockchain-tip-local，添加如下对象
-
-```
-{
-    "chainId": "mainnet_ethereum",
-    "blockNumber": 15988116 
-}
-```
-
 ![](matrix-cloud-blockchain-tip-local.png)
 
 - (optional) 验证kafka-local是否安装成功
@@ -67,8 +58,71 @@ DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin
 可以去https://www.alchemy.com/ 或者 https://www.infura.io/ 创建app并获取endpoint然后填入
 matrix-cloud-blockchain-syncer 中application-local下的blockchain:ethereum-provider-endpoint
 
-3. 启动Syncer服务
+3. 初始化数据库
+
+打开表 `matrix-cloud-blockchain-tip-local`，添加如下对象
+
+``` json
+{
+    "chainId": "mainnet_ethereum",
+    "blockNumber": 15988116
+}
+{
+    "chainId": "mainnet_bsc",
+    "blockNumber": 23525262
+}
+{
+    "chainId": "mainnet_polygon",
+    "blockNumber": 36285528
+}
+```
+
+4. 启动Syncer服务
 
 如果本地环境中没有aws相关配置，在环境变量中设置AWS_ACCESS_KEY_ID=123;AWS_SECRET_KEY=123以跳过aws检查
 
 使用IDEA打开matrix-cloud-blockchain-syncer文件夹，启动matrix-cloud-blockchain-syncer下的SyncerApplication服务
+
+## Retrieve data
+
+1. 使用 RPC 客户端（例如：[BloomRPC](https://github.com/bloomrpc/bloomrpc) 调用 `0.0.0.0:9090` runSyncTask。
+
+Request:
+``` json
+{
+    "chainType": "ethereum", 
+    "chainName": "mainnet", 
+    "step": 10,
+    "blockBuff": 3
+}
+```
+收到以下响应表示同步成功
+
+Response:
+``` json
+{
+  "chainType": "ethereum",
+  "blockRange": {
+    "chainType": "ethereum",
+    "chainName": "mainnet",
+    "from": "15988117",
+    "to": "15988126",
+    "chainId": "mainnet_ethereum",
+    "start": "0",
+    "end": "0",
+    "forceFromChain": false,
+    "blockBuff": 3,
+    "history": false
+  },
+  "status": "SUCCESS",
+  "errorMessage": ""
+}
+```
+
+![](bloomRPC.png)
+
+此时打开 `matrix-cloud-eth-transaction-local` 表可以看到同步到的区块和交易信息。
+
+2. (optional) 启动下游服务 `matrix-cloud-blockchain-event-handler-service`
+
+启动下游服务 `matrix-cloud-blockchain-event-handler-service` 后重复步骤1，此时打开 matrix-cloud-token-local 表可以看到下游handler解析出的token数据。
