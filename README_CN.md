@@ -119,6 +119,8 @@ Response:
 }
 ```
 
+![](bloomRPC.png)
+
 此时打开 `matrix-cloud-eth-transaction-local` 表可以看到同步到的区块和交易信息。
 
 2. (optional) 启动下游服务 `matrix-cloud-blockchain-event-handler-service`
