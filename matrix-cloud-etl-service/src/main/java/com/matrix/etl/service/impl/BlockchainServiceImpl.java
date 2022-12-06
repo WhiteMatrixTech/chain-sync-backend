@@ -3,10 +3,12 @@ package com.matrix.etl.service.impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.protobuf.Empty;
+import com.matrix.etl.dao.BlockTipDao;
 import com.matrix.etl.dao.ETHTransactionDao;
 import com.matrix.etl.dao.EthereumBlockEventDao;
 import com.matrix.etl.dao.TaskDao;
 import com.matrix.etl.dao.TaskDefDao;
+import com.matrix.etl.model.BlockTip;
 import com.matrix.etl.model.BlockTransaction;
 import com.matrix.etl.model.ChainType;
 import com.matrix.etl.model.EthereumBlockEvent;
@@ -51,6 +53,8 @@ public class BlockchainServiceImpl implements BlockchainService {
 
   @Resource EthereumBlockEventDao ethereumBlockEventDao;
 
+  @Resource BlockTipDao blockTipDao;
+
   @GrpcClient("matrix-cloud-blockchain-event-handler-service")
   BlockchainEventHandlerServiceBlockingStub blockchainEventHandlerServiceBlockingStub;
 
@@ -67,6 +71,7 @@ public class BlockchainServiceImpl implements BlockchainService {
         taskDef -> {
           final String status;
           final String taskType;
+          Long blockNumber = null;
           if (taskDef.getCreateTime().toString().length() == 10) {
             taskDef.setCreateTime(taskDef.getCreateTime() * 1000);
           }
@@ -81,6 +86,11 @@ public class BlockchainServiceImpl implements BlockchainService {
           } else {
             taskType = "BACK_FILL";
           }
+          if ("SYNC_LATEST".equals(taskType)) {
+            final BlockTip item =
+                blockTipDao.getItem(map.get("chainName") + "_" + map.get("chainType"));
+            blockNumber = item.getBlockNumber();
+          }
           final SimpleTask simpleTask =
               SimpleTask.builder()
                   .taskType(taskType)
@@ -89,6 +99,7 @@ public class BlockchainServiceImpl implements BlockchainService {
                   .blockchain((String) map.get("chainType"))
                   .createTime(taskDef.getCreateTime())
                   .params(taskDef.getParams())
+                  .blockNumber(blockNumber)
                   .build();
           simpleTasks.add(simpleTask);
         });

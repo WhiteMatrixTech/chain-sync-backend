@@ -5,6 +5,7 @@ import com.matrix.dynamodb.orm.DynamoDBTableOrmManager;
 import com.matrix.dynamodb.orm.impl.AnnotatedDynamoDBTableOrmManager;
 import com.matrix.etl.config.DynamoDbConfig;
 import com.matrix.etl.dao.ETHTransactionDao;
+import com.matrix.etl.model.BlockTip;
 import com.matrix.etl.model.EthereumBlockEvent;
 import com.matrix.etl.model.Task;
 import com.matrix.etl.model.TaskDef;
@@ -47,5 +48,11 @@ public class DynamoDBModule {
   @Bean
   public ETHTransactionDao ethTransactionDao(final DynamoDB dynamoDB) {
     return new ETHTransactionDao(dynamoDBConfig.getEthTransactionTableName(), dynamoDB);
+  }
+
+  @Bean("blockchainTipOrmManager")
+  public DynamoDBTableOrmManager<BlockTip> getBlockchainTipOrmManager() {
+    return new AnnotatedDynamoDBTableOrmManager<>(
+        this.dynamoDBConfig.getBlockchainTipTableName(), BlockTip.class);
   }
 }
