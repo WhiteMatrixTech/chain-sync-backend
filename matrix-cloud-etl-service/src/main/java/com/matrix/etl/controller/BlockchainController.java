@@ -1,9 +1,9 @@
 package com.matrix.etl.controller;
 
-import com.matrix.etl.model.response.QueryAppResponse;
 import com.matrix.etl.model.response.QueryBlockResponse;
 import com.matrix.etl.model.response.QueryEventsResponse;
 import com.matrix.etl.model.response.QueryHandlerResponse;
+import com.matrix.etl.model.response.QueryTaskLogResponse;
 import com.matrix.etl.model.response.QueryTaskResponse;
 import com.matrix.etl.model.response.QueryTransactionResponse;
 import com.matrix.etl.service.BlockchainService;
@@ -33,16 +33,16 @@ public class BlockchainController {
     return this.blockchainService.queryTask();
   }
 
+  @ApiOperation(value = "task log data")
+  @GetMapping("/taskLogs")
+  public QueryTaskLogResponse queryTaskRunning(@RequestParam final String taskName) {
+    return this.blockchainService.queryTaskName(taskName);
+  }
+
   @ApiOperation(value = "event handler data")
   @GetMapping("/handlers")
   public QueryHandlerResponse queryHandler() {
     return this.blockchainService.queryHandler();
-  }
-
-  @ApiOperation(value = "app data")
-  @GetMapping("/apps")
-  public QueryAppResponse queryApp() {
-    return this.blockchainService.queryApp();
   }
 
   @ApiOperation(value = "block data")

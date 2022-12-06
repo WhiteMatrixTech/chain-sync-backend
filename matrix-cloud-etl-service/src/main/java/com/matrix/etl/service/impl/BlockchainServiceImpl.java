@@ -1,13 +1,8 @@
 package com.matrix.etl.service.impl;
 
-import com.amazonaws.services.dynamodbv2.document.QueryFilter;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.protobuf.Empty;
-import com.matrix.dynamodb.model.CursorQuerySpec;
 import com.matrix.etl.dao.ETHTransactionDao;
 import com.matrix.etl.dao.EthereumBlockEventDao;
 import com.matrix.etl.dao.TaskDao;
@@ -16,31 +11,26 @@ import com.matrix.etl.model.BlockTransaction;
 import com.matrix.etl.model.ChainType;
 import com.matrix.etl.model.EthereumBlockEvent;
 import com.matrix.etl.model.HandlerType;
-import com.matrix.etl.model.SimpleApp;
 import com.matrix.etl.model.SimpleBlock;
 import com.matrix.etl.model.SimpleHandler;
 import com.matrix.etl.model.SimpleTask;
 import com.matrix.etl.model.SimpleTransaction;
 import com.matrix.etl.model.Task;
 import com.matrix.etl.model.TaskDef;
-import com.matrix.etl.model.response.QueryAppResponse;
 import com.matrix.etl.model.response.QueryBlockResponse;
 import com.matrix.etl.model.response.QueryEventsResponse;
 import com.matrix.etl.model.response.QueryHandlerResponse;
+import com.matrix.etl.model.response.QueryTaskLogResponse;
 import com.matrix.etl.model.response.QueryTaskResponse;
 import com.matrix.etl.model.response.QueryTransactionResponse;
 import com.matrix.etl.service.BlockchainService;
 import com.matrix.eventhandler.model.BlockchainEventHandlerServiceGrpc.BlockchainEventHandlerServiceBlockingStub;
 import com.matrix.eventhandler.model.BlockchainEventHandlers;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Resource;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -66,58 +56,49 @@ public class BlockchainServiceImpl implements BlockchainService {
 
   static Gson GSON = new Gson();
 
-  LoadingCache<String, Map<String, String>> taskDefCache =
-      CacheBuilder.newBuilder()
-          .expireAfterAccess(10, TimeUnit.MINUTES)
-          .build(
-              new CacheLoader<>() {
-                @Override
-                public Map<String, String> load(@NonNull final String key) {
-                  return taskDefDao.scan().stream()
-                      .collect(
-                          Collectors.toMap(
-                              TaskDef::getTaskName,
-                              taskDef -> {
-                                final Map<String, Object> map =
-                                    GSON.fromJson(taskDef.getParams(), HashMap.class);
-                                return map.get("chainType") == null
-                                    ? ""
-                                    : (String) map.get("chainType");
-                              }));
-                }
-              });
 
   @SneakyThrows
   @Override
   public QueryTaskResponse queryTask() {
-    final Map<String, String> taskNameToChainTypeMap = taskDefCache.get("taskDef");
-    return QueryTaskResponse.builder()
-        .tasks(
-            Stream.of(
-                    taskDao
-                        .queryByCursor(
-                            "sync_request_flow_mainnet_spork13_reverse",
-                            CursorQuerySpec.builder().limit(50).build(),
-                            new QueryFilter(Task.ATTR_STATUS).in("SUCCESS", "PROCESSING"))
-                        .getItems(),
-                    taskDao
-                        .queryByCursor(
-                            "sync_retry_mainnet_ethereum",
-                            CursorQuerySpec.builder().limit(50).build(),
-                            new QueryFilter(Task.ATTR_STATUS).in("SUCCESS", "PROCESSING"))
-                        .getItems())
-                .flatMap(List::stream)
-                .map(
-                    task ->
-                        SimpleTask.builder()
-                            .blockchain(taskNameToChainTypeMap.get(task.getTaskName()))
-                            .taskName(task.getTaskName())
-                            .taskId(task.getTaskId())
-                            .createTime(task.getCreateTime())
-                            .status(task.getStatus())
-                            .build())
-                .collect(Collectors.toList()))
-        .build();
+    final List<SimpleTask> simpleTasks = new ArrayList<>();
+    final List<TaskDef> taskDefs = taskDefDao.scan();
+    // format create time
+    taskDefs.forEach(
+        taskDef -> {
+          final String status;
+          final String taskType;
+          if (taskDef.getCreateTime().toString().length() == 10) {
+            taskDef.setCreateTime(taskDef.getCreateTime() * 1000);
+          }
+          if (Boolean.TRUE.equals(taskDef.getDelete())) {
+            status = "paused";
+          } else {
+            status = "active";
+          }
+          final Map map = GSON.fromJson(taskDef.getParams(), Map.class);
+          if (map.get("end") == null && !"sync_retry_request".equals(taskDef.getTaskType())) {
+            taskType = "SYNC_LATEST";
+          } else {
+            taskType = "BACK_FILL";
+          }
+          final SimpleTask simpleTask =
+              SimpleTask.builder()
+                  .taskType(taskType)
+                  .taskName(taskDef.getTaskName())
+                  .status(status)
+                  .blockchain((String) map.get("chainType"))
+                  .createTime(taskDef.getCreateTime())
+                  .params(taskDef.getParams())
+                  .build();
+          simpleTasks.add(simpleTask);
+        });
+    return QueryTaskResponse.builder().tasks(simpleTasks).build();
+  }
+
+  @Override
+  public QueryTaskLogResponse queryTaskName(final String taskName) {
+    final List<Task> tasks = taskDao.queryWithLimit(taskName, 50);
+    return QueryTaskLogResponse.builder().tasks(tasks).build();
   }
 
   @Override
@@ -136,41 +117,12 @@ public class BlockchainServiceImpl implements BlockchainService {
                                 "Default".equals(handler.getGroup())
                                     ? HandlerType.DEFAULT
                                     : HandlerType.CUSTOM)
+                            .appName(handler.getGroup())
                             .build())
                 .collect(Collectors.toList()))
         .build();
   }
 
-  @Override
-  public QueryAppResponse queryApp() {
-    final Map<String, List<String>> map = new HashMap<>();
-    final BlockchainEventHandlers eventHandlers =
-        blockchainEventHandlerServiceBlockingStub.getHandlers(Empty.getDefaultInstance());
-    eventHandlers.getHandlersList().stream()
-        .filter(blockchainEventHandler -> !"Default".equals(blockchainEventHandler.getGroup()))
-        .forEach(
-            blockchainEventHandler -> {
-              if (map.get(blockchainEventHandler.getGroup()) == null) {
-                map.put(
-                    blockchainEventHandler.getGroup(),
-                    new ArrayList<>(List.of(blockchainEventHandler.getName())));
-              } else {
-                map.get(blockchainEventHandler.getGroup()).add(blockchainEventHandler.getName());
-              }
-            });
-    return QueryAppResponse.builder()
-        .apps(
-            map.entrySet().stream()
-                .map(
-                    entry ->
-                        SimpleApp.builder()
-                            .blockchain(ChainType.ethereum)
-                            .appName(entry.getKey())
-                            .handlers(entry.getValue())
-                            .build())
-                .collect(Collectors.toList()))
-        .build();
-  }
 
   @Override
   public QueryBlockResponse queryBlock(final String chainType, final Long blockNumber) {

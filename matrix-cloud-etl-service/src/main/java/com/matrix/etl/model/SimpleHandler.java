@@ -14,4 +14,6 @@ public class SimpleHandler {
   ChainType blockchain;
   String handlerName;
   HandlerType type;
+  String kafkaTopic;
+  String appName;
 }
