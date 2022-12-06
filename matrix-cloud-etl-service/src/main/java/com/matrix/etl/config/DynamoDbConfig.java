@@ -16,4 +16,5 @@ public class DynamoDbConfig {
   private String tokenTableName;
   private String ethTransactionTableName;
   private String ethereumEventTableName;
+  private String blockchainTipTableName;
 }

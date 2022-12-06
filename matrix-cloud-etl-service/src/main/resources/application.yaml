@@ -19,6 +19,7 @@ dynamodb:
   token-table-name: matrix-cloud-token-${STAGE:local}
   eth-transaction-table-name: matrix-cloud-eth-transaction-${STAGE:local}
   ethereum-event-table-name: matrix-cloud-ethereum-event-${STAGE:local}
+  blockchain-tip-table-name: matrix-cloud-blockchain-tip-${STAGE:local}
 cloud:
   aws:
     region:

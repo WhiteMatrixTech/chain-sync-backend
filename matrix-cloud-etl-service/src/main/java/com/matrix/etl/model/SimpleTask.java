@@ -13,7 +13,9 @@ import lombok.extern.jackson.Jacksonized;
 public class SimpleTask {
   String blockchain;
   String taskName;
-  Long taskId;
+  String taskType;
   Long createTime;
   String status;
+  String params;
+  Long blockNumber;
 }
