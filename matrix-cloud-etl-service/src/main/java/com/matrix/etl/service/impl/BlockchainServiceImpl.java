@@ -166,13 +166,16 @@ public class BlockchainServiceImpl implements BlockchainService {
   }
 
   @Override
-  public QueryTransactionResponse queryTransaction(
-      final String chainType, final String transactionHash) {
+  public QueryTransactionResponse queryTransaction(final String chainType, final Long blockNumber) {
     final List<BlockTransaction> blockTransactions;
-    if (transactionHash != null) {
+    if (blockNumber != null) {
       blockTransactions =
-          ethTransactionDao.queryByPartitionKeyOnGsi(
-              BlockTransaction.INDEX_TRANSACTION_HASH, transactionHash);
+          ethTransactionDao.queryByPartitionKeyWithLimit(blockNumber, 50).stream()
+              .filter(
+                  blockTransaction ->
+                      !BlockTransaction.ROOT_TRANSACTION_HASH.equals(
+                          blockTransaction.getTransactionHash()))
+              .collect(Collectors.toList());
     } else {
       blockTransactions = ethTransactionDao.scanWithLimit(50);
     }

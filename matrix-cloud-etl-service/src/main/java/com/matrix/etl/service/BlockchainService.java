@@ -21,7 +21,7 @@ public interface BlockchainService {
 
   QueryBlockResponse queryBlock(String chainType, Long blockNumber);
 
-  QueryTransactionResponse queryTransaction(String chainType, String transactionHash);
+  QueryTransactionResponse queryTransaction(String chainType, Long blockNumber);
 
   QueryEventsResponse queryEvents(String chainType);
 }

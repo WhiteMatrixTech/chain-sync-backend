@@ -57,8 +57,8 @@ public class BlockchainController {
   @GetMapping("/transactions")
   public QueryTransactionResponse queryTransaction(
       @RequestParam final String chainType,
-      @RequestParam(required = false) final String transactionHash) {
-    return this.blockchainService.queryTransaction(chainType, transactionHash);
+      @RequestParam(required = false) final Long blockNumber) {
+    return this.blockchainService.queryTransaction(chainType, blockNumber);
   }
 
   @ApiOperation(value = "events data")

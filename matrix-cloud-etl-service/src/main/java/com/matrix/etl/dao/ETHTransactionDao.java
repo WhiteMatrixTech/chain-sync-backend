@@ -43,4 +43,17 @@ public class ETHTransactionDao extends BaseQueryDao<BlockTransaction> {
             .getIndex(indexName)
             .query(querySpec));
   }
+
+  public List<BlockTransaction> queryByPartitionKeyWithLimit(
+      final Object partitionKeyValue, final int limit) {
+    final QuerySpec querySpec =
+        new QuerySpec()
+            .withHashKey(
+                this.getTableDefinition().getHashAndSortKey().getHashKey().getKeyName(),
+                partitionKeyValue)
+            .withMaxResultSize(limit);
+
+    return queryOutcomeToItems(
+        this.getDynamoDB().getTable(this.getTableDefinition().getTableName()).query(querySpec));
+  }
 }
