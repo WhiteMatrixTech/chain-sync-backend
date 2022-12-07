@@ -1,7 +1,0 @@
-grpc:
-  client:
-    matrix-cloud-blockchain-event-handler-service:
-      address: 'static://matrix-cloud-blockchain-event-handler-service:9090'
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext

@@ -1,7 +1,0 @@
-grpc:
-  client:
-    matrix-cloud-theirsverse-service:
-      address: 'static://matrix-cloud-theirsverse-service:9090'
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext

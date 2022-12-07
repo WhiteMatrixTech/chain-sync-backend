@@ -1,7 +1,0 @@
-grpc:
-  client:
-    matrix-cloud-blockchain-syncer:
-      address: 'static://matrix-cloud-blockchain-syncer:9090'
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext

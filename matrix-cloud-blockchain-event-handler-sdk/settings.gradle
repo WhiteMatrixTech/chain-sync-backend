@@ -1,4 +1,0 @@
-rootProject.name = 'matrix-cloud-blockchain-event-handler-sdk'
-
-includeBuild "../matrix-cloud-blockchain-event-handler-model"
-includeBuild '../matrix-cloud-common-kafka'

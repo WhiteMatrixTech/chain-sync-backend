@@ -1,3 +1,0 @@
-# Auto Configuration, need use with @EnableAutoConfiguration
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.matrix.eventhandler.module.EventHandlerKafkaClientModule

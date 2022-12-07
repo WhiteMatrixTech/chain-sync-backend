@@ -1,5 +1,0 @@
-includeBuild '../matrix-dynamodb-sdk'
-includeBuild '../matrix-cloud-dao'
-includeBuild '../matrix-cloud-common-model-grpc'
-includeBuild '../matrix-cloud-blockchain-event-handler-grpc'
-rootProject.name = 'matrix-cloud-etl-service'
