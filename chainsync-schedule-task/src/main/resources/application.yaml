@@ -12,7 +12,7 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 dynamodb:
-  task-def-table-name: matrix-cloud-task-def-${STAGE:local}
-  task-table-name: matrix-cloud-task-${STAGE:local}
+  task-def-table-name: chainsync-task-def-${STAGE:local}
+  task-table-name: chainsync-task-${STAGE:local}
 schedule:
   taskDelay: 1000

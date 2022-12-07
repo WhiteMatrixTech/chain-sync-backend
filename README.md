@@ -35,7 +35,7 @@ If you start SyncerApplication, you can see the information in the following tab
 
 ![](dynamodb-admin.png)
 
-Open the table matrix-cloud-blockchain-tip-local and add the following objects:
+Open the table chainsync-blockchain-tip-local and add the following objects:
 
 ``` json
 {
@@ -44,7 +44,7 @@ Open the table matrix-cloud-blockchain-tip-local and add the following objects:
 }
 ```
 
-![](matrix-cloud-blockchain-tip-local.png)
+![](chainsync-blockchain-tip-local.png)
 
 
 - Verify that kafka-local is installed successfully (optional)
@@ -73,4 +73,4 @@ If there is no AWS-related configuration in the local environment, set AWS_ACCES
 AWS_SECRET_KEY=123 in the environment variable to skip the AWS check.
 
 Use IDEA to open the chainsync-blockchain-syncer folder and start the SyncerApplication service
-under matrix-cloud-blockchain-syncer.
+under chainsync-blockchain-syncer.

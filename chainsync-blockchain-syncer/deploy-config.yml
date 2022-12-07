@@ -1,5 +1,5 @@
 app: matrix-cloud
-service: matrix-cloud-blockchain-syncer
+service: chainsync-blockchain-syncer
 ports:
   - port: 9090
     targetPort: 9090

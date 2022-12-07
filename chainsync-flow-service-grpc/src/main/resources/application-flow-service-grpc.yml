@@ -1,7 +1,7 @@
 grpc:
   client:
     matrix-cloud-flow-service:
-      address: 'static://matrix-cloud-flow-service:9090'
+      address: 'static://chainsync-flow-service:9090'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext

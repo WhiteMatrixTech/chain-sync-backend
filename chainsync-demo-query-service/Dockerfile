@@ -1,6 +1,6 @@
 FROM openjdk:11
 VOLUME /tmp
-ADD build/libs/matrix-cloud-etl-service.jar application.jar
+ADD build/libs/chainsync-demo-query-service.jar application.jar
 COPY bin/docker-start.sh /bin/docker-start.sh
 RUN chmod +x /bin/docker-start.sh
 CMD ["/bin/docker-start.sh"]

@@ -12,8 +12,8 @@ spring:
       matching-strategy: ant_path_matcher
   kafka:
     consumer:
-      group-id: matrix-cloud-blockchain-event-handler-service-${STAGE:local}
+      group-id: chainsync-blockchain-event-handler-service-${STAGE:local}
 dynamodb:
-  nft-collection-name: matrix-cloud-nft-collection-${STAGE:local}
-  blockchain-contract-template-table-name: matrix-cloud-blockchain-contract-template-${STAGE:local}
-  token-table-name: matrix-cloud-token-${STAGE:local}
+  nft-collection-name: chainsync-nft-collection-${STAGE:local}
+  blockchain-contract-template-table-name: chainsync-blockchain-contract-template-${STAGE:local}
+  token-table-name: chainsync-token-${STAGE:local}

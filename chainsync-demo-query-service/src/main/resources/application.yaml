@@ -14,12 +14,12 @@ spring:
 knife4j:
   enable: true
 dynamodb:
-  task-def-table-name: matrix-cloud-task-def-${STAGE:local}
-  task-table-name: matrix-cloud-task-${STAGE:local}
-  token-table-name: matrix-cloud-token-${STAGE:local}
-  eth-transaction-table-name: matrix-cloud-eth-transaction-${STAGE:local}
-  ethereum-event-table-name: matrix-cloud-ethereum-event-${STAGE:local}
-  blockchain-tip-table-name: matrix-cloud-blockchain-tip-${STAGE:local}
+  task-def-table-name: chainsync-task-def-${STAGE:local}
+  task-table-name: chainsync-task-${STAGE:local}
+  token-table-name: chainsync-token-${STAGE:local}
+  eth-transaction-table-name: chainsync-eth-transaction-${STAGE:local}
+  ethereum-event-table-name: chainsync-ethereum-event-${STAGE:local}
+  blockchain-tip-table-name: chainsync-blockchain-tip-${STAGE:local}
 cloud:
   aws:
     region:
