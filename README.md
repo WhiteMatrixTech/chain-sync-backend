@@ -39,8 +39,16 @@ Open the table chainsync-blockchain-tip-local and add the following objects:
 
 ``` json
 {
-  "chainId": "mainnet_ethereum",
-  "blockNumber": 15988116
+    "chainId": "mainnet_ethereum",
+    "blockNumber": 15988116
+}
+{
+    "chainId": "mainnet_bsc",
+    "blockNumber": 23525262
+}
+{
+    "chainId": "mainnet_polygon",
+    "blockNumber": 36285528
 }
 ```
 
