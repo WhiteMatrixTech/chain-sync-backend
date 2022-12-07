@@ -1,5 +1,5 @@
 syntax = "proto3";
-package com.matrix.common;
+package com.chainsync.common;
 import "google/protobuf/any.proto";
 
 message ErrorDetail {

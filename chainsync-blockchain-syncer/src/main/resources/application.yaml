@@ -3,7 +3,7 @@ grpc:
     port: 9090
 spring:
   application:
-    name: matrix-cloud-blockchain-syncer
+    name: chainsync-blockchain-syncer
   profiles:
     active: ${STAGE:local}
     include: flow-event-fetcher-grpc, metrics, flow-service-grpc

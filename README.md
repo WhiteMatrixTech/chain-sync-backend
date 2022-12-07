@@ -1,4 +1,4 @@
-# matrix-cloud-ETL
+# chainsync
 
 - JDK 11
 - Docker
