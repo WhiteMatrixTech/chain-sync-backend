@@ -5,7 +5,7 @@ import "google/protobuf/empty.proto";
 package com.matrix.eventhandler.model;
 
 option java_multiple_files = true;
-option java_package = "com.matrix.eventhandler.model";
+option java_package = "com.chainsync.eventhandler.model";
 option java_outer_classname = "BlockchainEventHandlerServiceProto";
 
 service BlockchainEventHandlerService {

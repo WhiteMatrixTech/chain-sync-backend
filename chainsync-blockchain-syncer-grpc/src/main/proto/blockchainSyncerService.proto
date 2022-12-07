@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package com.matrix.blockchain.model;
+package com.chainsync.blockchain.model;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 
 option java_multiple_files = true;
-option java_package = "com.matrix.blockchain.model";
+option java_package = "com.chainsync.blockchain.model";
 option java_outer_classname = "BlockChainSyncServiceProto";
 
 service BlockChainSyncService {

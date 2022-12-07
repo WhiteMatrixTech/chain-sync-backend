@@ -25,6 +25,6 @@
     }
   ],
   "name": "BlockchainTransactionDTO",
-  "namespace": "com.matrix.eventhandler.model",
+  "namespace": "com.chainsync.eventhandler.model",
   "type": "record"
 }

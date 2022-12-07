@@ -1,4 +1,4 @@
-# matrix-cloud-ETL
+# chainsync
 
 - JDK 11
 - Docker
@@ -65,12 +65,12 @@ After starting SyncerApplication, you can see the following information
 
 Visit https://www.alchemy.com/ or https://www.infura.io/ to create an app and get the endpoint and
 fill it in blockchain:ethereum-provider-endpoint under application-local in
-matrix-cloud-blockchain-syncer.
+chainsync-blockchain-syncer.
 
 3. Start the Syncer service
 
 If there is no AWS-related configuration in the local environment, set AWS_ACCESS_KEY_ID=123;
 AWS_SECRET_KEY=123 in the environment variable to skip the AWS check.
 
-Use IDEA to open the matrix-cloud-blockchain-syncer folder and start the SyncerApplication service
+Use IDEA to open the chainsync-blockchain-syncer folder and start the SyncerApplication service
 under matrix-cloud-blockchain-syncer.
