@@ -1,0 +1,403 @@
+{
+  "fields": [
+    {
+      "name": "transactionTags",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
+      "name": "flowBurnEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowBurnEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "burner",
+              "type": "string"
+            },
+            {
+              "name": "tokenId",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowListingEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowListingEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "eventIndex",
+              "type": "int"
+            },
+            {
+              "name": "lister",
+              "type": "string"
+            },
+            {
+              "name": "listingResourceID",
+              "type": "string"
+            },
+            {
+              "name": "nftType",
+              "type": "string"
+            },
+            {
+              "name": "tokenId",
+              "type": "string"
+            },
+            {
+              "name": "ftVaultType",
+              "type": "string"
+            },
+            {
+              "name": "price",
+              "type": "string"
+            },
+            {
+              "name": "listingPrice",
+              "type": "string"
+            },
+            {
+              "name": "cuts",
+              "type": {
+                "type": "map",
+                "values": "string"
+              },
+              "default": {}
+            },
+            {
+              "name": "cutsAddress",
+              "default": [],
+              "type": {
+                "type": "array",
+                "items": "string"
+              }
+            },
+            {
+              "name": "cutsFee",
+              "default": [],
+              "type": {
+                "type": "array",
+                "items": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowListingCompletedEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowListingCompletedEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "eventIndex",
+              "type": "int"
+            },
+            {
+              "name": "storefrontResourceID",
+              "type": "string"
+            },
+            {
+              "name": "listingResourceID",
+              "type": "string"
+            },
+            {
+              "name": "purchased",
+              "type": "boolean"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowOfferEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowOfferEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "eventIndex",
+              "type": "int"
+            },
+            {
+              "name": "offerer",
+              "type": "string"
+            },
+            {
+              "name": "offerId",
+              "type": "string"
+            },
+            {
+              "name": "nftType",
+              "type": "string"
+            },
+            {
+              "name": "tokenId",
+              "type": "string"
+            },
+            {
+              "name": "ftVaultType",
+              "type": "string"
+            },
+            {
+              "name": "price",
+              "type": "string"
+            },
+            {
+              "name": "expirationTime",
+              "type": "long"
+            },
+            {
+              "name": "offerPrice",
+              "type": "string"
+            },
+            {
+              "name": "cuts",
+              "type": {
+                "type": "map",
+                "values": "string"
+              },
+              "default": {}
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowOfferCompletedEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowOfferCompletedEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "eventIndex",
+              "type": "int"
+            },
+            {
+              "name": "offerId",
+              "type": "string"
+            },
+            {
+              "name": "purchased",
+              "type": "boolean"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowMintEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowMintEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "receiver",
+              "type": "string"
+            },
+            {
+              "name": "tokenId",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowSaleEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowSaleEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "from",
+              "type": "string"
+            },
+            {
+              "name": "to",
+              "type": "string"
+            },
+            {
+              "name": "amount",
+              "type": "string"
+            },
+            {
+              "name": "amountUnit",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowTransferEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowTransferEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            },
+            {
+              "name": "tokenId",
+              "type": "string"
+            },
+            {
+              "name": "from",
+              "type": "string"
+            },
+            {
+              "name": "to",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "flowContractInitializedEvents",
+      "default": [],
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "FlowContractInitializedEventsRecord",
+          "type": "record",
+          "fields": [
+            {
+              "name": "eventName",
+              "type": "string"
+            },
+            {
+              "name": "rawContractAddress",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "transactionHash",
+      "type": "string"
+    },
+    {
+      "name": "transactionIndex",
+      "type": "long"
+    },
+    {
+      "name": "blockNumber",
+      "type": "long"
+    },
+    {
+      "name": "blockTimestamp",
+      "type": "long"
+    },
+    {
+      "name": "contractAddress",
+      "type": "string"
+    },
+    {
+      "name": "chainType",
+      "type": "string"
+    },
+    {
+      "name": "chainName",
+      "type": "string"
+    }
+  ],
+  "name": "FlowConvertedEventsDTO",
+  "namespace": "com.matrix.eventhandler.model",
+  "type": "record"
+}

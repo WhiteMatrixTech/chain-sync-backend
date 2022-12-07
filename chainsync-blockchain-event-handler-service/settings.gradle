@@ -1,0 +1,8 @@
+rootProject.name = 'chainsync-blockchain-event-handler-service'
+includeBuild '../chainsync-blockchain-event-handler-model'
+includeBuild '../chainsync-blockchain-event-handler-grpc'
+includeBuild '../chainsync-blockchain-event-handler-sdk'
+includeBuild '../chainsync-theirsverse-service-grpc'
+includeBuild '../chainsync-dao'
+includeBuild '../chainsync-dynamodb-sdk'
+includeBuild '../chainsync-common-model'

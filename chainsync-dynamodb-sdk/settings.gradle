@@ -1,0 +1,3 @@
+rootProject.name = 'chainsync-dynamodb-sdk'
+includeBuild '../chainsync-common-model'
+

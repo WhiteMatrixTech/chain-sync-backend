@@ -1,0 +1,61 @@
+plugins {
+    id 'java-library'
+    id "io.freefair.lombok" version "6.3.0"
+    id 'org.springframework.boot' version '2.6.2' apply false
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'jacoco'
+}
+
+group = 'com.matrix'
+sourceCompatibility = JavaVersion.VERSION_11
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://packages.confluent.io/maven'
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+    }
+}
+
+dependencies {
+//    api 'software.amazon.msk:aws-msk-iam-auth:1.1.4'
+//    api 'com.amazonaws:aws-java-sdk-sts:1.12.141'
+//    api 'software.amazon.glue:schema-registry-serde:1.1.12'
+    api 'io.confluent:kafka-streams-avro-serde:7.0.1'
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+    exclude '**/*IntegrationTest*'
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+task integrationTest(type: Test) {
+    testLogging {
+        showStandardStreams = true
+    }
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        html.destination file("${buildDir}/reports/jacoco/html")
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/coverage.xml")
+    }
+}

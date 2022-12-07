@@ -1,0 +1,70 @@
+{
+  "fields": [
+    {
+      "name": "removed",
+      "type": "boolean"
+    },
+    {
+      "name": "chainType",
+      "type": "string"
+    },
+    {
+      "name": "chainName",
+      "type": "string"
+    },
+    {
+      "name": "blockNumber",
+      "type": "long"
+    },
+    {
+      "name": "logIndex",
+      "type": "long"
+    },
+    {
+      "name": "transactionIndex",
+      "type": "long"
+    },
+    {
+      "name": "transactionHash",
+      "type": "string"
+    },
+    {
+      "name": "blockHash",
+      "type": "string"
+    },
+    {
+      "name": "address",
+      "type": "string"
+    },
+    {
+      "name": "data",
+      "type": "string"
+    },
+    {
+      "name": "persistenceData",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "name": "type",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
+      "name": "blockTimestamp",
+      "type": "long"
+    },
+    {
+      "name": "topics",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    }
+  ],
+  "name": "BlockchainEventLogDTO",
+  "namespace": "com.matrix.eventhandler.model",
+  "type": "record"
+}

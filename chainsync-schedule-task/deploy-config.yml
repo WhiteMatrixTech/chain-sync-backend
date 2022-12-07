@@ -1,0 +1,33 @@
+app: matrix-cloud
+service: schedule-task
+project: marketplace
+ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+metrics:
+  scrape: true
+  path: /metrics/prometheus
+hpa: false
+serviceAccountName: aws-access
+resources:
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+  requests:
+    cpu: "1"
+    memory: "1Gi"
+replicas: 3
+deploy:
+  image: ${deploy-image}
+  stage:
+    alpha:
+      cluster: matrix-alpha
+      namespace: alpha
+      autoSync: true
+    beta:
+      cluster: matrix-beta
+      namespace: beta
+    prod:
+      cluster: matrix-prod
+      namespace: prod

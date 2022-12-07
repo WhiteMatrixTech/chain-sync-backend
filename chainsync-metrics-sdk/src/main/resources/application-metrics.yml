@@ -1,0 +1,12 @@
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      base-path: /metrics
+      exposure:
+        include: prometheus
+  server:
+    port: 5000

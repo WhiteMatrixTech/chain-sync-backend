@@ -1,0 +1,19 @@
+grpc:
+  server:
+    port: 9090
+spring:
+  main:
+    web-application-type: none
+  profiles:
+    active: ${STAGE:local}
+    include: theirsverse-grpc
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  kafka:
+    consumer:
+      group-id: matrix-cloud-blockchain-event-handler-service-${STAGE:local}
+dynamodb:
+  nft-collection-name: matrix-cloud-nft-collection-${STAGE:local}
+  blockchain-contract-template-table-name: matrix-cloud-blockchain-contract-template-${STAGE:local}
+  token-table-name: matrix-cloud-token-${STAGE:local}

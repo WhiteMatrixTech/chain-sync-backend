@@ -1,0 +1,3 @@
+rootProject.name = 'chainsync-metrics-sdk'
+include 'annotation-test'
+

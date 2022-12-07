@@ -1,0 +1,18 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /task
+spring:
+  application:
+    name: task
+  profiles:
+    active: ${STAGE:local}
+    include: blockchain-syncer-grpc, metrics
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+dynamodb:
+  task-def-table-name: matrix-cloud-task-def-${STAGE:local}
+  task-table-name: matrix-cloud-task-${STAGE:local}
+schedule:
+  taskDelay: 1000

@@ -1,0 +1,82 @@
+plugins {
+    id 'java-library'
+    id "io.freefair.lombok" version "6.3.0"
+    id 'org.springframework.boot' version '2.6.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'jacoco'
+}
+
+group = 'com.matrix'
+sourceCompatibility = JavaVersion.VERSION_11
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://s3-us-west-2.amazonaws.com/dynamodb-local/release'
+    }
+    maven {
+        url 'https://packages.confluent.io/maven'
+    }
+}
+
+dependencies {
+    // inner dependency
+    implementation 'com.matrix:chainsync-blockchain-syncer-grpc'
+    implementation 'com.matrix:chainsync-common-model'
+    implementation 'com.matrix:chainsync-common-model-grpc'
+    implementation 'com.matrix:chainsync-dynamodb-sdk'
+    implementation 'com.matrix:chainsync-dao'
+    implementation 'com.matrix:chainsync-blockchain-event-handler-sdk'
+    implementation 'com.matrix:chainsync-flow-service-grpc'
+    implementation 'com.matrix:chainsync-metrics-sdk'
+
+    // common dependency
+    implementation 'net.devh:grpc-spring-boot-starter:2.13.1.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    implementation 'org.glassfish:jakarta.json:2.0.1'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'org.web3j:core:4.9.2'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.220'
+
+    // test only dependency
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.grpc:grpc-testing:1.46.0'
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+    exclude '**/*IntegrationTest*'
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+task integrationTest(type: Test) {
+    testLogging {
+        showStandardStreams = true
+    }
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        html.destination file("${buildDir}/reports/jacoco/html")
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/coverage.xml")
+        csv.enabled true
+        csv.destination file("${buildDir}/reports/jacoco/coverage.csv")
+    }
+}

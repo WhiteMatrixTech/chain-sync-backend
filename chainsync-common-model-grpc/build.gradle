@@ -1,0 +1,55 @@
+buildscript {
+    dependencies {
+        classpath "com.google.protobuf:protobuf-gradle-plugin:${protobufGradlePluginVersion}"
+    }
+}
+
+plugins {
+    id 'com.google.protobuf' version "${protobufGradlePluginVersion}"
+    id 'java-library'
+    id "io.freefair.lombok" version "6.3.0"
+}
+
+group = 'com.matrix'
+sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    api "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+    compileOnly 'com.matrix:chainsync-common-model'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web:2.6.2'
+    compileOnly 'net.devh:grpc-spring-boot-starter:2.13.1.RELEASE'
+    api 'com.google.code.gson:gson:2.9.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {
+                setOutputSubDir 'java'
+            }
+        }
+    }
+}

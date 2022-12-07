@@ -1,0 +1,5 @@
+includeBuild '../chainsync-dynamodb-sdk'
+includeBuild '../chainsync-dao'
+includeBuild '../chainsync-common-model-grpc'
+includeBuild '../chainsync-blockchain-event-handler-grpc'
+rootProject.name = 'chainsync-demo-query-service'
