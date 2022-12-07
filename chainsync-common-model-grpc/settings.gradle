@@ -1,0 +1,2 @@
+rootProject.name = 'chainsync-common-model-grpc'
+includeBuild '../chainsync-common-model'

@@ -1,7 +1,0 @@
-includeBuild '../matrix-common-model'
-includeBuild '../matrix-cloud-common-model-grpc'
-includeBuild '../matrix-cloud-blockchain-syncer-grpc'
-includeBuild "../matrix-cloud-dao"
-includeBuild '../matrix-dynamodb-sdk'
-includeBuild '../matrix-cloud-metrics-sdk'
-rootProject.name = 'matrix-cloud-schedule-task'

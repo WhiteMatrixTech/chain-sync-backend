@@ -1,0 +1,4 @@
+rootProject.name = 'chainsync-blockchain-event-handler-sdk'
+
+includeBuild "../chainsync-blockchain-event-handler-model"
+includeBuild '../chainsync-common-kafka'
