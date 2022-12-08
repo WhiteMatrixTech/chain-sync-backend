@@ -1,4 +1,6 @@
-# chainsync
+# chainsync-backend
+
+## Prerequisites
 
 - JDK 11
 - Docker
@@ -10,13 +12,13 @@ https://github.com/WhiteMatrixTech/chain-sync-front
 
 ## Run locally
 
-1. create the necessary local environment through docker and docker-compose
+1. Start dependent components
 
 ```
 docker-compose up -d
 ```
 
-- Verify that dynamodb-local is installed successfully (optional)
+- (optional) Verify that dynamodb-local is installed successfully
 
 ```
 npm install -g dynamodb-admin
@@ -35,7 +37,30 @@ If you start SyncerApplication, you can see the information in the following tab
 
 ![](dynamodb-admin.png)
 
-Open the table chainsync-blockchain-tip-local and add the following objects:
+![](chainsync-blockchain-tip-local.png)
+
+- (optional) Verify that Kafka-local is installed successfully
+
+Download and install Kafka tool according to the platform：https://www.kafkatool.com/download.html
+
+Connection configuration
+
+![](kafka-viewer-config1.png)
+
+![](kafka-viewer-config2.png)
+
+After starting SyncerApplication, you can see the following topic information
+
+![](kafka-viewer.png)
+
+2. Apply for Ethereum network endpoint
+
+You can go to https://www.alchemy.com/ or https://www.infura.io/ to create an app and get the endpoint and fill it in
+blockchain:ethereum-provider-endpoint under application-local in chainsync-blockchain-syncer
+
+3. Initialize the database
+
+Open the table `chainsync-blockchain-tip-local` and add the following pair
 
 ``` json
 {
@@ -52,7 +77,7 @@ Open the table chainsync-blockchain-tip-local and add the following objects:
 }
 ```
 
-Open the table chainsync-task-def-local and add the following objects:
+Open the table `chainsync-task-def-local` and add the following objects
 
 ```json
 {
@@ -68,33 +93,54 @@ Open the table chainsync-task-def-local and add the following objects:
 }
 ```
 
-![](chainsync-blockchain-tip-local.png)
+4. Start the Syncer service
 
+If there is no aws-related configuration in the local environment, set AWS_ACCESS_KEY_ID=123; AWS_SECRET_KEY=123 in the environment variable to skip the aws check
 
-- Verify that kafka-local is installed successfully (optional)
+Use IDEA to open the chainsync-blockchain-syncer folder and start the SyncerApplication service under chainsync-blockchain-syncer
 
-Download and install kafka tool according to the platform：https://www.kafkatool.com/download.html
+## Retrieve data
 
-Connection configuration
+1. Call `0.0.0.0:9090` runSyncTask using an RPC client such as [BloomRPC](https://github.com/bloomrpc/bloomrpc).
 
-![](kafka-viewer-config1.png)
+Request:
+``` json
+{
+    "chainType": "ethereum", 
+    "chainName": "mainnet", 
+    "step": 10,
+    "blockBuff": 3
+}
+```
+Receiving the following response indicates that the synchronization is successful
 
-![](kafka-viewer-config2.png)
+Response:
+``` json
+{
+  "chainType": "ethereum",
+  "blockRange": {
+    "chainType": "ethereum",
+    "chainName": "mainnet",
+    "from": "15988117",
+    "to": "15988126",
+    "chainId": "mainnet_ethereum",
+    "start": "0",
+    "end": "0",
+    "forceFromChain": false,
+    "blockBuff": 3,
+    "history": false
+  },
+  "status": "SUCCESS",
+  "errorMessage": ""
+}
+```
 
-After starting SyncerApplication, you can see the following information
+![](bloomRPC.png)
 
-![](kafka-viewer.png)
+At this time, open the `chainsync-eth-transaction-local` table to see the synchronized block and transaction information.
 
-2. Apply for Ethereum network endpoint
+2. (optional) Start the downstream service `chainsync-blockchain-event-handler-service`
 
-Visit https://www.alchemy.com/ or https://www.infura.io/ to create an app and get the endpoint and
-fill it in blockchain:ethereum-provider-endpoint under application-local in
-chainsync-blockchain-syncer.
+Start the downstream service `chainsync-blockchain-event-handler-service` and repeat step 1. At this time, open the chainsync-token-local table to see the token data parsed by the downstream handler.
 
-3. Start the Syncer service
-
-If there is no AWS-related configuration in the local environment, set AWS_ACCESS_KEY_ID=123;
-AWS_SECRET_KEY=123 in the environment variable to skip the AWS check.
-
-Use IDEA to open the chainsync-blockchain-syncer folder and start the SyncerApplication service
-under chainsync-blockchain-syncer.
+3. After confirming that step 2 is successful, start the TaskApplication service under `chainsync-schedule-task` to automatically synchronize blocks at regular intervals
