@@ -137,6 +137,9 @@ public class BlockchainServiceImpl implements BlockchainService {
 
   @Override
   public QueryBlockResponse queryBlock(final String chainType, final Long blockNumber) {
+    if (!ChainType.ethereum.name().equals(chainType)){
+      return QueryBlockResponse.builder().build();
+    }
     final List<BlockTransaction> blockTransactions;
     if (blockNumber != null) {
       blockTransactions =
@@ -167,6 +170,9 @@ public class BlockchainServiceImpl implements BlockchainService {
 
   @Override
   public QueryTransactionResponse queryTransaction(final String chainType, final Long blockNumber) {
+    if (!ChainType.ethereum.name().equals(chainType)){
+      return QueryTransactionResponse.builder().build();
+    }
     final List<BlockTransaction> blockTransactions;
     if (blockNumber != null) {
       blockTransactions =
@@ -206,6 +212,6 @@ public class BlockchainServiceImpl implements BlockchainService {
       final List<EthereumBlockEvent> ethereumBlockEvents = ethereumBlockEventDao.scanWithLimit(50);
       return QueryEventsResponse.builder().events(ethereumBlockEvents).build();
     }
-    return null;
+    return QueryEventsResponse.builder().build();
   }
 }

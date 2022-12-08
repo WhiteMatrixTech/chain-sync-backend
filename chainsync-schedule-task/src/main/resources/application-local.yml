@@ -1,8 +1,13 @@
+server:
+  port: 8086
 spring:
   redis:
     host: localhost
     port: 6379
     database: 1
+management:
+  server:
+    port: 5001
 grpc:
   client:
     matrix-cloud-blockchain-syncer:
