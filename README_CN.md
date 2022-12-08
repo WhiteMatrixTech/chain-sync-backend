@@ -8,7 +8,7 @@
 
 ## Frontend repository
 
-https://github.com/WhiteMatrixTech/matrix-cloud-ETL-front-public
+https://github.com/WhiteMatrixTech/chain-sync-front
 
 ## Run locally
 
@@ -142,3 +142,5 @@ Response:
 2. (optional) 启动下游服务 `chainsync-blockchain-event-handler-service`
 
 启动下游服务 `chainsync-blockchain-event-handler-service` 后重复步骤1，此时打开 chainsync-token-local 表可以看到下游handler解析出的token数据。
+
+3. 确定2成功后，启动 `chainsync-schedule-task` 下的TaskApplication服务即可自动定时同步区块

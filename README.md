@@ -6,7 +6,7 @@
 
 ## Frontend repository
 
-https://github.com/WhiteMatrixTech/matrix-cloud-ETL-front-public
+https://github.com/WhiteMatrixTech/chain-sync-front
 
 ## Run locally
 
