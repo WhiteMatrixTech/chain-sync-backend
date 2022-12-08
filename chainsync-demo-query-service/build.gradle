@@ -37,6 +37,10 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'com.github.xiaoymin:knife4j-spring-boot-starter:3.0.3'
     implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.220'
+    implementation 'org.web3j:core:4.9.0'
+    implementation 'commons-validator:commons-validator:1.7'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
     // test only dependency
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

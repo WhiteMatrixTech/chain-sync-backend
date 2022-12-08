@@ -77,6 +77,22 @@ chainsync-blockchain-syncer 中application-local下的blockchain:ethereum-provid
 }
 ```
 
+打开表 `chainsync-task-def-local`，添加如下对象
+
+```json
+{
+ "taskName": "sync_blockchain_ethereum_mainnet",
+ "createTime": 1653093501391,
+ "delete": false,
+ "expression": "5000",
+ "latestModifyTime": 1653093501398,
+ "params": "{\"chainType\": \"ethereum\", \"chainName\": \"mainnet\", \"step\": 10}",
+ "repeated_mode": "fixed_delay",
+ "sync": true,
+ "taskType": "sync_blockchain"
+}
+```
+
 4. 启动Syncer服务
 
 如果本地环境中没有aws相关配置，在环境变量中设置AWS_ACCESS_KEY_ID=123;AWS_SECRET_KEY=123以跳过aws检查

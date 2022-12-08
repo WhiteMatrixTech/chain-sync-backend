@@ -52,6 +52,22 @@ Open the table chainsync-blockchain-tip-local and add the following objects:
 }
 ```
 
+Open the table chainsync-task-def-local and add the following objects:
+
+```json
+{
+ "taskName": "sync_blockchain_ethereum_mainnet",
+ "createTime": 1653093501391,
+ "delete": false,
+ "expression": "5000",
+ "latestModifyTime": 1653093501398,
+ "params": "{\"chainType\": \"ethereum\", \"chainName\": \"mainnet\", \"step\": 10}",
+ "repeated_mode": "fixed_delay",
+ "sync": true,
+ "taskType": "sync_blockchain"
+}
+```
+
 ![](chainsync-blockchain-tip-local.png)
 
 

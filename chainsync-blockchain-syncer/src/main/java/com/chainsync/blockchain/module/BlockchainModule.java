@@ -2,9 +2,12 @@ package com.chainsync.blockchain.module;
 
 import com.chainsync.blockchain.config.BlockchainConfig;
 import com.chainsync.blockchain.model.Web3jContainer;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Resource;
+import okhttp3.OkHttpClient;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,23 +20,20 @@ import org.web3j.protocol.http.HttpService;
 @Configuration
 public class BlockchainModule {
 
-  //  final String hostname = "localhost";
-  //  final int port = 7890;
-  //
-  //  final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(hostname, port));
-  //  final OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
+  final String hostname = "localhost";
+  final int port = 7890;
+
+  final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(hostname, port));
+  final OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
 
   @Resource private BlockchainConfig blockchainConfig;
 
-  /**
-   * ethereum
-   *
-   */
+  /** ethereum */
   @Bean("ethereumWeb3j")
   public Web3jContainer getEthereumWeb3j() {
     final List<Web3j> web3jList = Lists.newArrayList();
     blockchainConfig.getEthereumProviderEndpoint().stream()
-        .forEach(endpoint -> web3jList.add(Web3j.build(new HttpService(endpoint))));
+        .forEach(endpoint -> web3jList.add(Web3j.build(new HttpService(endpoint, client))));
     return Web3jContainer.builder().web3jList(web3jList).index(new AtomicInteger()).build();
   }
 

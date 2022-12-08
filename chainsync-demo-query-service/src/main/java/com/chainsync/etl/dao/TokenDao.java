@@ -1,5 +1,6 @@
 package com.chainsync.etl.dao;
 
+import com.amazonaws.services.dynamodbv2.document.AttributeUpdate;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.ScanFilter;
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
@@ -26,5 +27,9 @@ public class TokenDao extends CursorQueryDao<Token> {
   public List<Token> scanWithLimit(int limit) {
     return this.scan(new ScanSpec().withMaxResultSize(limit)
         .withScanFilters(new ScanFilter(Token.ATTR_TOKEN_METADATA_RAW).exists()));
+  }
+
+  public void update(final String address, final String tokenId, final List<AttributeUpdate> attributeUpdates) {
+    this.updateItem(address, tokenId, attributeUpdates, null);
   }
 }

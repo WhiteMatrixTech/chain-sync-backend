@@ -1,6 +1,6 @@
 package com.chainsync.etl.model.response;
 
-import com.chainsync.etl.model.Token;
+import com.chainsync.etl.model.TokenResponse;
 import java.util.List;
 import lombok.Builder;
 import lombok.Value;
@@ -14,5 +14,5 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 public class QueryTokenResponse {
 
-  List<Token> tokens;
+  List<TokenResponse> tokens;
 }
