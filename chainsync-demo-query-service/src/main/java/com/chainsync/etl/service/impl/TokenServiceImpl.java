@@ -2,6 +2,7 @@ package com.chainsync.etl.service.impl;
 
 import com.amazonaws.services.dynamodbv2.document.AttributeUpdate;
 import com.chainsync.common.model.Address;
+import com.chainsync.common.util.PublicHttpFetcher;
 import com.chainsync.etl.dao.TokenDao;
 import com.chainsync.etl.model.Token;
 import com.chainsync.etl.service.TokenService;
@@ -15,7 +16,6 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
@@ -38,8 +38,8 @@ public class TokenServiceImpl implements TokenService {
 
   @Resource TokenDao tokenDao;
 
-  @Resource
-  RestTemplate restTemplate;
+  // the tokenURI comes from the contract, it must not make us request internal addresses
+  private final PublicHttpFetcher publicHttpFetcher = new PublicHttpFetcher();
 
   private final Web3j web3j =
       Web3j.build(
@@ -113,8 +113,9 @@ public class TokenServiceImpl implements TokenService {
         address.getCanonicalAddress(),
         tokenId,
         List.of(new AttributeUpdate(Token.ATTR_TOKEN_METADATA_URI).put(tokenURI)));
-    if (UrlValidator.getInstance().isValid(tokenURI)) {
-      final String tokenMetadataRaw = restTemplate.getForObject(tokenURI, String.class);
+    if (UrlValidator.getInstance().isValid(tokenURI)
+        && PublicHttpFetcher.isPublicHttpUrl(tokenURI)) {
+      final String tokenMetadataRaw = publicHttpFetcher.fetch(tokenURI);
       tokenDao.update(
           address.getCanonicalAddress(),
           tokenId,

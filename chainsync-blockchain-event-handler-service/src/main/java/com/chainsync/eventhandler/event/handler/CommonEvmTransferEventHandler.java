@@ -7,6 +7,7 @@ import com.chainsync.eventhandler.module.ThreadPoolExecutorModule;
 import com.chainsync.common.exception.ErrorCodedException;
 import com.chainsync.common.model.Address;
 import com.chainsync.common.response.ResultCode;
+import com.chainsync.common.util.PublicHttpFetcher;
 import com.chainsync.eventhandler.dao.TokenDao;
 import com.chainsync.eventhandler.model.EvmEvent;
 import java.math.BigInteger;
@@ -24,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
@@ -51,7 +51,8 @@ public class CommonEvmTransferEventHandler implements BlockchainEventHandler, In
 
   @Resource TokenDao tokenDao;
 
-  @Resource RestTemplate restTemplate;
+  // the tokenURI comes from the contract, it must not make us request internal addresses
+  private final PublicHttpFetcher publicHttpFetcher = new PublicHttpFetcher();
 
   @Resource RetryTemplate retryTemplate;
 
@@ -174,10 +175,11 @@ public class CommonEvmTransferEventHandler implements BlockchainEventHandler, In
         List.of(new AttributeUpdate(Token.ATTR_TOKEN_METADATA_URI).put(tokenURI)));
 
     // todo not handle ethereum ipfs now
-    if (UrlValidator.getInstance().isValid(tokenURI)) {
+    if (UrlValidator.getInstance().isValid(tokenURI)
+        && PublicHttpFetcher.isPublicHttpUrl(tokenURI)) {
       final String tokenMetadataRaw =
           retryTemplate.execute(
-              context -> restTemplate.getForObject(tokenURI, String.class),
+              context -> publicHttpFetcher.fetch(tokenURI),
               context -> {
                 log.error(
                     "retry 3 times failed when get metadata from tokenURI, tokenURI: {}",
